@@ -205,3 +205,8 @@ button,a{outline-offset:3px}
 .top-risk-section .station-table-note{margin:-3px 0 9px}
 .top-risk-section .basin-station-table-wrap{max-height:275px;min-height:215px;overflow:auto;border:1px solid #e5e7ed;border-radius:7px}
 .top-risk-section .basin-station-table{min-width:1040px}
+
+/* Sort directly from table headers */
+.table-sort-button{appearance:none;border:0;background:transparent;color:inherit;font:inherit;font-weight:700;padding:0;display:inline-flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap}
+.table-sort-button:after{content:"↕";color:#8f96a5;font-size:7px;font-weight:500}.table-sort-button.active.asc:after{content:"↑";color:var(--primary)}.table-sort-button.active.desc:after{content:"↓";color:var(--primary)}
+.table-sort-button:hover,.table-sort-button:focus-visible{color:var(--primary);outline:none;text-decoration:underline;text-underline-offset:2px}

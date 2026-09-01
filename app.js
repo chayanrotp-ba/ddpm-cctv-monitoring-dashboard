@@ -10,8 +10,8 @@
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version 1.1.2";
-    badge.title = "Patch version: v1.1.2 · baseline: v1.0-baseline";
+    badge.textContent = "Version 1.1.3";
+    badge.title = "Patch version: v1.1.3 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -146,12 +146,15 @@
     const stationRecords = detailStationRecords(detail);
     const severityOrder = { red:5, orange:4, yellow:3, blue:2, green:1 };
     const severityLabels = { red:"ต้องอพยพ", orange:"อพยพ", yellow:"เตรียมรับมือ", blue:"เฝ้าระวัง", green:"ติดตาม" };
-    const alertSeverities = ["red","orange","yellow","blue","green"];
+    const riskSeverities = ["red","orange","yellow"];
     const summarySeverities = ["red","orange","yellow","blue","green"];
     let activeProvince = "all";
     let activeCriteria = "all";
     let activeSensorType = "rain";
-    let activeStationSort = "province";
+    const tableSortState = {
+      risk:{key:"severity",direction:"desc"},
+      summary:{key:"code",direction:"asc"}
+    };
     const provinceOf = item => item.province || (item.area || "").replace("จังหวัด", "").replace(/^(ต้นน้ำ|กลางน้ำ|ท้ายน้ำ)\s*·\s*/, "").trim();
     const matchesFilters = item => (activeProvince === "all" || provinceOf(item) === activeProvince) && (activeCriteria === "all" || item.severity === activeCriteria);
     const normalizeCode = code => String(code || "").replace(/-/g, "").toUpperCase();
@@ -160,7 +163,7 @@
     const breadcrumbName = $(".breadcrumb b"); if (breadcrumbName) breadcrumbName.textContent = `ลุ่มน้ำ${detail.name}`;
     const title = $(".basin-title-row h1"); if (title) title.textContent = `ลุ่มน้ำ${detail.name}`;
     const mapPane = $(".map-pane"); if (mapPane) mapPane.setAttribute("aria-label", `แผนที่สถานีในลุ่มน้ำ${detail.name}`);
-    const provinceLine = $(".province-line"); if (provinceLine) provinceLine.textContent = `พาดผ่าน ${detail.provinces.length} จังหวัด · ${detail.provinces.join(" ")}`;
+    const provinceLine = $(".province-line"); if (provinceLine) provinceLine.textContent = `ติดตั้งใน ${detail.provinces.length} จังหวัด · ${detail.provinces.join(" ")}`;
     const provinceChips = $(".province-chips");
     if (provinceChips) provinceChips.innerHTML = `<button class="active" type="button" data-province="all">ทุกจังหวัด</button>${detail.provinces.map(name => `<button type="button" data-province="${name}">${name}</button>`).join("")}`;
 
@@ -195,6 +198,21 @@
       const direction = Number(station.trend) > 0 ? "↑" : Number(station.trend) < 0 ? "↓" : "−";
       return `<tr data-focus-station="${station.code}" tabindex="0" role="button" aria-label="เลื่อนไปยัง ${station.code} บนแผนที่"><td>${index + 1}</td><td><b>${station.code} · ${station.name}</b><small>${stationLocationText(station)}</small></td><td><span class="basin-water-value ${station.severity}">${level.toFixed(2)} ม.</span></td><td><span class="bank-value">${bank.toFixed(2)} ม.</span></td><td><b class="difference-value ${station.severity}">+${difference.toFixed(2)} ม.</b></td><td><span class="trend-value ${station.severity}">${direction} ${Math.abs(Number(station.trend)).toFixed(2)} ม./ชม.</span></td><td><span class="station-status ${station.severity}">${severityLabels[station.severity] || station.statusLabel || "—"}</span></td><td><time>28/08/2569 10:40 น.</time></td><td><div class="station-tools"><button class="station-tool" type="button" data-station-action="history" data-station-code="${station.code}" title="กราฟระดับน้ำย้อนหลัง" aria-label="กราฟระดับน้ำย้อนหลัง ${station.code}">⌁</button><button class="station-tool" type="button" data-station-action="analysis" data-station-code="${station.code}" title="ผลวิเคราะห์ระดับน้ำ" aria-label="ผลวิเคราะห์ระดับน้ำ ${station.code}">▣</button></div></td></tr>`;
     };
+    const sortStationsForTable = (stations, state) => {
+      const direction = state.direction === "asc" ? 1 : -1;
+      const numericValue = (station, key) => key === "bank" ? stationBank(station) : key === "excess" ? stationExcess(station) : Number(station[key]);
+      return [...stations].sort((a,b) => {
+        let comparison = 0;
+        if (state.key === "code") comparison = String(a.province || "").localeCompare(String(b.province || ""),"th") || String(a.code || "").localeCompare(String(b.code || ""),"en",{numeric:true});
+        else if (state.key === "severity") {
+          comparison = severityOrder[a.severity] - severityOrder[b.severity];
+          if (comparison === 0) comparison = stationExcess(a) - stationExcess(b);
+        }
+        else comparison = numericValue(a,state.key) - numericValue(b,state.key);
+        if (comparison !== 0) return comparison * direction;
+        return String(a.code || "").localeCompare(String(b.code || ""),"en",{numeric:true});
+      });
+    };
     const renderAllStations = () => {
       if (allStationRows) allStationRows.innerHTML = latestRankedStations.length
         ? latestRankedStations.map((station,index) => stationRowMarkup(station,index,false)).join("")
@@ -205,11 +223,9 @@
     const render = () => {
       const visibleStations = stationRecords.filter(matchesFilters);
       const rankedStations = rankStations(visibleStations);
-      const topStations = rankedStations.filter(station => alertSeverities.includes(station.severity));
-      const summaryStations = activeStationSort === "severity" ? rankedStations : [...visibleStations].sort((a,b) =>
-        String(a.province || "").localeCompare(String(b.province || ""),"th") ||
-        String(a.code || "").localeCompare(String(b.code || ""),"en",{numeric:true})
-      );
+      const riskRankedStations = rankStations(visibleStations.filter(station => riskSeverities.includes(station.severity)));
+      const topStations = sortStationsForTable(riskRankedStations,tableSortState.risk);
+      const summaryStations = sortStationsForTable(visibleStations,tableSortState.summary);
       latestRankedStations = rankedStations;
       const visibleSensors = (detail.sensors || []).filter(matchesFilters);
       const visibleCctv = (detail.cctv || []).filter(matchesFilters);
@@ -225,8 +241,8 @@
         counts[severity] = visibleStations.filter(item => item.severity === severity).length;
         return counts;
       },{});
-      const highestStationSeverity = alertSeverities.find(severity => stationCounts[severity] > 0);
-      const highestStation = topStations[0];
+      const highestStationSeverity = riskSeverities.find(severity => stationCounts[severity] > 0);
+      const highestStation = riskRankedStations[0];
       const fastestStation = [...visibleStations].sort((a,b) => Number(b.trend) - Number(a.trend))[0];
       const highPeakValue = $("#summaryHighPeakValue");
       const highPeakNote = $("#summaryHighPeakNote");
@@ -236,7 +252,7 @@
       const summaryTrendNote = $("#summaryTrendNote");
       if (highPeakValue) highPeakValue.textContent = highestStation ? `${Number(highestStation.level).toFixed(2)} ม.` : "—";
       if (highPeakNote) highPeakNote.textContent = highestStation ? `${highestStation.code} · เกินเกณฑ์ +${stationExcess(highestStation).toFixed(2)} ม.` : "ไม่พบข้อมูลตามตัวกรอง";
-      if (summaryStationTotal) summaryStationTotal.textContent = `${topStations.length} จุด`;
+      if (summaryStationTotal) summaryStationTotal.textContent = `${visibleStations.length} จุด`;
       if (summaryStationBreakdown) summaryStationBreakdown.textContent = summarySeverities.map(severity => `${severityLabels[severity]} ${stationCounts[severity]}`).join(" · ");
       if (summaryTrendValue) summaryTrendValue.textContent = fastestStation ? `${Number(fastestStation.trend) >= 0 ? "+" : ""}${Number(fastestStation.trend).toFixed(2)} ม./ชม.` : "—";
       if (summaryTrendNote) summaryTrendNote.textContent = fastestStation ? `${fastestStation.code} · ${fastestStation.name}` : "ไม่พบข้อมูลตามตัวกรอง";
@@ -245,9 +261,9 @@
         ? `<i class="filter-dot ${highestStationSeverity}"></i>${severityLabels[highestStationSeverity]} ${stationCounts[highestStationSeverity]} จุด <small>· แสดงครบ ${topStations.length} สถานี</small>`
         : `ไม่พบ CCTV ตามตัวกรอง <small>· แสดง 0 สถานี</small>`;
       const riskSummary = $("#riskSummary");
-      if (riskSummary) riskSummary.innerHTML = alertSeverities.map(severity => `<span class="${severity}"><i></i>${severityLabels[severity]} <b>${stationCounts[severity]}</b></span>`).join("");
+      if (riskSummary) riskSummary.innerHTML = riskSeverities.map(severity => `<span class="${severity}"><i></i>${severityLabels[severity]} <b>${stationCounts[severity]}</b></span>`).join("");
       const topRiskScope = $("#topRiskScope");
-      if (topRiskScope) topRiskScope.textContent = `${activeProvince === "all" ? "ทุกจังหวัด" : `จังหวัด${activeProvince}`} · ${visibleStations.length} สถานี`;
+      if (topRiskScope) topRiskScope.textContent = `${activeProvince === "all" ? "ทุกจังหวัด" : `จังหวัด${activeProvince}`} · ${topStations.length} สถานีความเสี่ยงสูง`;
 
       const sensorAlertCount = $("#sensorAlertCount");
       if (sensorAlertCount) sensorAlertCount.textContent = `${highestByType.length} รายการสูงสุด`;
@@ -288,6 +304,14 @@
       if (basinAllStationRows) basinAllStationRows.innerHTML = summaryStations.length
         ? summaryStations.map((station,index) => fullStationRowMarkup(station,index)).join("")
         : `<tr><td colspan="9"><div class="empty-state">ไม่พบสถานีตามตัวกรองที่เลือก</div></td></tr>`;
+      $$('[data-table-sort]').forEach(button => {
+        const state = tableSortState[button.dataset.tableSort];
+        const active = state?.key === button.dataset.sortKey;
+        button.classList.toggle("active", active);
+        button.classList.toggle("asc", active && state.direction === "asc");
+        button.classList.toggle("desc", active && state.direction === "desc");
+        button.setAttribute("aria-pressed", String(active));
+      });
       renderAllStations();
 
       const legend = $("#basinLegendItems");
@@ -452,10 +476,16 @@
       });
       render();
     }));
-    $("#stationSort")?.addEventListener("change", event => {
-      activeStationSort = event.currentTarget.value;
+    $$('[data-table-sort]').forEach(button => button.addEventListener("click", () => {
+      const state = tableSortState[button.dataset.tableSort];
+      if (!state) return;
+      if (state.key === button.dataset.sortKey) state.direction = state.direction === "asc" ? "desc" : "asc";
+      else {
+        state.key = button.dataset.sortKey;
+        state.direction = state.key === "code" ? "asc" : "desc";
+      }
       render();
-    });
+    }));
     const legendPanel = $("#basinLegend");
     const legendToggle = $("#basinLegendToggle");
     const setLegendCollapsed = collapsed => {
@@ -531,7 +561,7 @@
   };
   const selectedBasinCode = new URLSearchParams(window.location.search).get("basin") || "09";
   const basinDrilldowns = {
-    "09": {name:"น่าน",severity:"red",statusLabel:"ต้องอพยพ",provinces:["น่าน","อุตรดิตถ์","พิษณุโลก","นครสวรรค์"],peak:"8.42",excess:"สูงกว่าเกณฑ์อพยพ 0.62 ม.",trend:"+0.38",severityBreakdown:"แดง 1 · ส้ม 1 · เหลือง 1",route:[[100.78,19.25],[100.74,18.75],[100.60,18.10],[100.35,17.62],[100.27,16.82]],stations:[
+    "09": {name:"น่าน",severity:"red",statusLabel:"ต้องอพยพ",provinces:["น่าน","อุตรดิตถ์"],peak:"8.42",excess:"สูงกว่าเกณฑ์อพยพ 0.62 ม.",trend:"+0.38",severityBreakdown:"แดง 6 · ส้ม 4 · เหลือง 2 · ฟ้า 2 · เขียว 2",route:[[100.78,19.25],[100.74,18.75],[100.60,18.10],[100.35,17.62],[100.27,16.82]],stations:[
     ],sensors:[
       {type:"flow",code:"WTR-NAN-01",name:"สถานีวัดระดับน้ำท่าน้ำยาว",area:"จังหวัดน่าน",value:"8.42 ม.",criterion:"เกณฑ์อพยพ 7.80 ม.",severity:"red",coordinate:[100.78,19.25]},
       {type:"rain",code:"RAN-NAN-12",name:"สถานีวัดปริมาณฝนเมืองน่าน",area:"จังหวัดน่าน",value:"126 มม.",criterion:"ฝนสะสม 24 ชม. · เกณฑ์ 90 มม.",severity:"orange",coordinate:[100.69,18.84]},
