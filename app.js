@@ -10,8 +10,8 @@
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version 1.1.3";
-    badge.title = "Patch version: v1.1.3 · baseline: v1.0-baseline";
+    badge.textContent = "Version 1.1.4";
+    badge.title = "Patch version: v1.1.4 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -300,7 +300,9 @@
       const basinAllStationCount = $("#basinAllStationCount");
       if (basinAllStationCount) basinAllStationCount.textContent = `${summaryStations.length} จุด`;
       const stationSummaryBreakdown = $("#stationSummaryBreakdown");
-      if (stationSummaryBreakdown) stationSummaryBreakdown.textContent = summarySeverities.map(severity => `${severityLabels[severity]} ${stationCounts[severity]}`).join(" · ");
+      if (stationSummaryBreakdown) stationSummaryBreakdown.textContent = `ครบ 5 ระดับ · ${activeProvince === "all" ? "ทุกจังหวัด" : `จังหวัด${activeProvince}`}`;
+      const stationSummaryRisk = $("#stationSummaryRisk");
+      if (stationSummaryRisk) stationSummaryRisk.innerHTML = summarySeverities.map(severity => `<span class="${severity}"><i></i>${severityLabels[severity]} <b>${stationCounts[severity]}</b></span>`).join("");
       if (basinAllStationRows) basinAllStationRows.innerHTML = summaryStations.length
         ? summaryStations.map((station,index) => fullStationRowMarkup(station,index)).join("")
         : `<tr><td colspan="9"><div class="empty-state">ไม่พบสถานีตามตัวกรองที่เลือก</div></td></tr>`;
@@ -576,17 +578,17 @@
       {type:"rain",code:"RAN-UTT-06",name:"สถานีวัดปริมาณฝน UTT06",area:"จังหวัดอุตรดิตถ์",value:"84 มม.",criterion:"ฝนสะสม 24 ชม. · เกณฑ์ 75 มม.",severity:"yellow",coordinate:[100.158,17.731]}
     ],cctv:[
       {code:"NAN01",name:"สะพานปอน",province:"น่าน",district:"ทุ่งช้าง",subdistrict:"ปอน",level:"8.42",bank:"7.80",trend:"+0.38",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[100.927400,19.518800]},
-      {code:"NAN02",name:"สะพานบ้านโรงเรียนไตรเขต",province:"น่าน",district:"เชียงกลาง",subdistrict:"เปือ",level:"7.18",bank:"6.80",trend:"+0.21",severity:"orange",statusLabel:"อพยพ",coordinate:[100.706600,19.357000]},
+      {code:"NAN02",name:"สะพานบ้านโรงเรียนไตรเขต",province:"น่าน",district:"เชียงกลาง",subdistrict:"เปือ",level:"7.18",bank:"7.40",trend:"+0.04",severity:"green",statusLabel:"ติดตาม",coordinate:[100.706600,19.357000]},
       {code:"NAN03",name:"สะพานบ้านป่าหัด",province:"น่าน",district:"ปัว",subdistrict:"วรนคร",level:"7.10",bank:"6.78",trend:"+0.18",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[100.863400,19.278100]},
-      {code:"NAN04",name:"สะพานท่าวังผา",province:"น่าน",district:"ท่าวังผา",subdistrict:"ท่าวังผา",level:"5.24",bank:"5.02",trend:"+0.07",severity:"yellow",statusLabel:"เฝ้าระวัง",coordinate:[100.803200,19.116600]},
+      {code:"NAN04",name:"สะพานท่าวังผา",province:"น่าน",district:"ท่าวังผา",subdistrict:"ท่าวังผา",level:"5.24",bank:"5.02",trend:"+0.07",severity:"orange",statusLabel:"อพยพ",coordinate:[100.803200,19.116600]},
       {code:"NAN05",name:"สะพานสันติสุข",province:"น่าน",district:"สันติสุข",subdistrict:"ดู่พงษ์",level:"6.88",bank:"6.68",trend:"+0.09",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[100.928700,19.087500]},
       {code:"NAN06",name:"สะพานเมืองวังศรีเสถียรพัฒนา",province:"น่าน",district:"ท่าวังผา",subdistrict:"ริม",level:"6.86",bank:"6.70",trend:"+0.19",severity:"orange",statusLabel:"อพยพ",coordinate:[100.795500,18.902500]},
-      {code:"NAN07",name:"ใต้สะพานพัฒนาภาคเหนือ",province:"น่าน",district:"เมืองน่าน",subdistrict:"ในเวียง",level:"7.95",bank:"7.47",trend:"+0.31",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[100.779100,18.775100]},
-      {code:"NAN08",name:"สะพานน้ำลานบ้านวังแดง",province:"น่าน",district:"เวียงสา",subdistrict:"กลางเวียง",level:"4.41",bank:"4.25",trend:"+0.04",severity:"blue",statusLabel:"เฝ้าระวัง",coordinate:[100.717000,18.583300]},
-      {code:"NAN09",name:"สะพานเวียงสา",province:"น่าน",district:"เวียงสา",subdistrict:"ไหล่น่าน",level:"4.28",bank:"4.10",trend:"+0.03",severity:"green",statusLabel:"ติดตาม",coordinate:[100.755400,18.570100]},
+      {code:"NAN07",name:"ใต้สะพานพัฒนาภาคเหนือ",province:"น่าน",district:"เมืองน่าน",subdistrict:"ในเวียง",level:"7.95",bank:"8.10",trend:"+0.08",severity:"yellow",statusLabel:"เตรียมรับมือ",coordinate:[100.779100,18.775100]},
+      {code:"NAN08",name:"สะพานน้ำลานบ้านวังแดง",province:"น่าน",district:"เวียงสา",subdistrict:"กลางเวียง",level:"4.41",bank:"3.79",trend:"+0.18",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[100.717000,18.583300]},
+      {code:"NAN09",name:"สะพานเวียงสา",province:"น่าน",district:"เวียงสา",subdistrict:"ไหล่น่าน",level:"4.28",bank:"4.10",trend:"+0.09",severity:"orange",statusLabel:"อพยพ",coordinate:[100.755400,18.570100]},
       {code:"NAN10",name:"สะพานร่วมใจสามัคคี",province:"น่าน",district:"บ่อเกลือ",subdistrict:"ดงพญา",level:"4.16",bank:"4.70",trend:"+0.02",severity:"blue",statusLabel:"เฝ้าระวัง",coordinate:[101.203400,19.194000]},
       {code:"UTT01",name:"จุดตรวจวัด UTT01",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"4.92",bank:"5.20",trend:"+0.06",severity:"green",statusLabel:"ติดตาม",coordinate:[101.105100,18.294050]},
-      {code:"UTT02",name:"จุดตรวจวัด UTT02",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"6.38",bank:"6.10",trend:"+0.12",severity:"orange",statusLabel:"อพยพ",coordinate:[101.103200,18.126400]},
+      {code:"UTT02",name:"จุดตรวจวัด UTT02",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"6.38",bank:"6.55",trend:"+0.05",severity:"blue",statusLabel:"เฝ้าระวัง",coordinate:[101.103200,18.126400]},
       {code:"UTT03",name:"จุดตรวจวัด UTT03",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"7.36",bank:"7.10",trend:"+0.24",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[101.035800,18.146500]},
       {code:"UTT04",name:"จุดตรวจวัด UTT04",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"7.82",bank:"7.40",trend:"+0.31",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[100.305189,17.763709]},
       {code:"UTT05",name:"จุดตรวจวัด UTT05",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"6.12",bank:"5.90",trend:"+0.15",severity:"orange",statusLabel:"อพยพ",coordinate:[100.083000,17.793920]},
@@ -784,6 +786,12 @@
     return ({red:"ต้องอพยพ",orange:"อพยพ",yellow:"เตรียมรับมือ",blue:"เฝ้าระวัง",green:"ติดตาม"})[severity] || "ไม่ระบุ";
   }
 
+  function cctvMarkerOffset(severity) {
+    if (severity === "green") return {x:-15,y:2};
+    if (severity === "blue") return {x:15,y:2};
+    return {x:0,y:0};
+  }
+
   function renderFallbackBasins() {
     const fallback = $(".map-fallback");
     if (!fallback || !basinFeatures.length) return;
@@ -851,7 +859,8 @@
     });
     if (page === "basin") (activeDrilldown.cctv || []).forEach(camera => {
       const [cx,cy] = projectCoordinate(camera.coordinate);
-      const marker = appendSvgElement(svg,"image",{x:(cx - 13).toFixed(1),y:(cy - 26).toFixed(1),width:26,height:26,href:cctvMarkerUrl(camera.severity),class:"real-cctv-marker","data-camera":camera.code,"data-map-filterable":"true","data-severity":camera.severity,"data-province":camera.province || ""});
+      const offset = cctvMarkerOffset(camera.severity);
+      const marker = appendSvgElement(svg,"image",{x:(cx - 13 + offset.x).toFixed(1),y:(cy - 26 - offset.y).toFixed(1),width:26,height:26,href:cctvMarkerUrl(camera.severity),class:"real-cctv-marker","data-camera":camera.code,"data-map-filterable":"true","data-severity":camera.severity,"data-province":camera.province || ""});
       marker.addEventListener("click", () => document.dispatchEvent(new CustomEvent("station-popup-request", { detail:{code:camera.code} })));
     });
     fallback.appendChild(svg);
@@ -905,11 +914,14 @@
           symbol:{type:"picture-marker",url:sensorMarkerDataUri(sensor.type,sensor.severity),width:21,height:21,xoffset:0,yoffset:8},
           attributes:{sensorCode:sensor.code,category:"sensor",severity:sensor.severity,province:sensor.province || sensor.area.replace("จังหวัด", "")},popupTemplate:{title:sensor.type === "rain" ? "Sensor ปริมาณฝน" : "Sensor น้ำท่า",content:`${sensor.name}<br><b>${sensor.value}</b><br>${sensor.criterion}`}
         })));
-        (drilldown.cctv || []).forEach(camera => stationLayer.add(new Graphic({
+        (drilldown.cctv || []).forEach(camera => {
+          const offset = cctvMarkerOffset(camera.severity);
+          stationLayer.add(new Graphic({
           geometry:{type:"point",longitude:camera.coordinate[0],latitude:camera.coordinate[1]},
-          symbol:{type:"picture-marker",url:cctvMarkerUrl(camera.severity),width:28,height:28,xoffset:0,yoffset:10},
+          symbol:{type:"picture-marker",url:cctvMarkerUrl(camera.severity),width:28,height:28,xoffset:offset.x,yoffset:10 + offset.y},
           attributes:{code:camera.code,category:"cctv",severity:camera.severity,province:camera.province},popupTemplate:{title:`${camera.code} · ${camera.name}`,content:`ต.${camera.subdistrict} อ.${camera.district} จ.${camera.province}<br><b>ระดับน้ำ ${camera.level} เมตร</b> · ระดับตลิ่ง ${camera.bank} เมตร<br><b>ระดับสถานการณ์ ${waterSeverityLabel(camera.severity)}</b>`}
-        })));
+          }));
+        });
       }
 
       if (page === "monitor") {

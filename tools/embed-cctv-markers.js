@@ -4,15 +4,17 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const root = path.resolve(__dirname, "..");
-const downloads = path.join(process.env.USERPROFILE || "C:\\Users\\chaya", "Downloads");
+const markerAssets = path.join(root, "assets", "cctv-markers");
 const markers = {
   yellow: "CCTV_WATER_HIGH.svg",
   orange: "CCTV_WATER_DANGER.svg",
-  red: "CCTV_WATER_SUPERCRITICAL.svg"
+  red: "CCTV_WATER_SUPERCRITICAL.svg",
+  blue: "CCTV_WATER_MEDIUM.svg",
+  green: "CCTV_WATER_LOW.svg"
 };
 
 const embedded = Object.fromEntries(Object.entries(markers).map(([severity, filename]) => {
-  const svg = fs.readFileSync(path.join(downloads, filename));
+  const svg = fs.readFileSync(path.join(markerAssets, filename));
   return [severity, `data:image/svg+xml;base64,${svg.toString("base64")}`];
 }));
 
