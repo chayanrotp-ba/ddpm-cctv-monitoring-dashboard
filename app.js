@@ -6,6 +6,15 @@
   const page = document.body.dataset.page || "overview";
   const RAIN_SENSOR_ICON = "assets/sensor-rain.png";
 
+  function initVersionBadge() {
+    if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
+    const badge = document.createElement("div");
+    badge.className = "version-baseline";
+    badge.textContent = "Version baseline";
+    badge.title = "Git version: v1.0-baseline";
+    document.body.appendChild(badge);
+  }
+
   function updateClock() {
     const target = $("#clock");
     if (!target) return;
@@ -946,6 +955,7 @@
   }
 
   updateClock();
+  initVersionBadge();
   window.setInterval(updateClock, 1000);
   renderFallbackBasins();
   if (page === "overview") initOverview();
