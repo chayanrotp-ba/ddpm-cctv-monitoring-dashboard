@@ -180,6 +180,8 @@ button,a{outline-offset:3px}
 @media(max-width:580px){.high-peak-summary-grid article{min-height:60px;padding:9px}}
 
 .top-risk-section .basin-station-table{min-width:680px}
+.top-risk-section .basin-station-table-wrap{max-height:360px;overflow:auto}.top-risk-section .basin-station-table th{position:sticky;top:0;z-index:1}.all-visible-count{display:grid;place-items:center;min-width:74px;height:34px;padding:4px 10px;border:1px solid #dfe2e8;border-radius:7px;background:#f8f9fb;color:#555c6b;font-size:8px;font-weight:600;white-space:nowrap}.all-visible-count small{display:block;color:var(--primary);font-size:7px}.station-summary-heading{align-items:center}.station-summary-tools{display:flex;align-items:stretch;gap:8px}.station-summary-metric{min-width:180px;padding:7px 10px;border:1px solid #dfe2e8;border-radius:7px;background:#f9fafc}.station-summary-metric span,.station-summary-metric small{display:block;font-size:6px;color:var(--muted)}.station-summary-metric b{display:block;font-size:14px;line-height:1.2}.station-summary-tools label{display:grid;align-content:center;gap:2px;min-width:130px}.station-summary-tools label>span{font-size:6px;color:var(--muted)}.station-summary-tools select{height:30px;border:1px solid #dfe2e8;border-radius:6px;background:#fff;padding:0 8px;color:#4f5563;font:inherit;font-size:8px;outline:none}.station-summary-tools select:focus{border-color:var(--primary)}
+@media(max-width:700px){.station-summary-heading{align-items:flex-start;flex-direction:column}.station-summary-tools{width:100%;flex-direction:column}.station-summary-metric{min-width:0}.station-summary-tools label{width:100%}}
 
 /* Production-style DDPM identity bar on the national map */
 .brand-title-card{left:15px;top:9px;width:min(380px,calc(100% - 30px));min-height:84px;padding:9px 16px 9px 12px;gap:12px;border:0;border-radius:14px;background:rgba(255,255,255,.72);box-shadow:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
@@ -187,3 +189,8 @@ button,a{outline-offset:3px}
 .brand-title-card .brand-title-copy{min-width:0;display:block;color:#090b0f}
 .brand-title-card .brand-title-copy b,.brand-title-card .brand-title-copy strong{display:block;margin:0;font-size:16px;font-weight:700;line-height:1.42;letter-spacing:-.2px;white-space:nowrap}
 @media(max-width:470px){.brand-title-card{min-height:76px;padding:8px 11px;gap:9px}.brand-title-card .agency-logo{width:58px;height:58px;flex-basis:58px}.brand-title-card .brand-title-copy b,.brand-title-card .brand-title-copy strong{font-size:clamp(12px,3.6vw,16px)}}
+
+/* Five-level station summary: alert, watch and follow-up states */
+.station-status.blue{color:#3177b8}.station-status.blue:before{background:#56a9e8}.station-status.green{color:#16835d}.station-status.green:before{background:#2fc88f}
+.basin-water-value.blue{background:#e8f4ff;color:#3177b8}.basin-water-value.green{background:#e7f8f1;color:#16835d}.difference-value.blue,.trend-value.blue{color:#3177b8}.difference-value.green,.trend-value.green{color:#16835d}
+.basin-all-station-table{min-width:1040px}
