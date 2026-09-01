@@ -66,11 +66,13 @@
           <button type="button" data-criteria="red"><i class="filter-dot red"></i>ต้องอพยพ</button>
           <button type="button" data-criteria="orange"><i class="filter-dot orange"></i>อพยพ</button>
           <button type="button" data-criteria="yellow"><i class="filter-dot yellow"></i>เตรียมรับมือ</button>
+          <button type="button" data-criteria="blue"><i class="filter-dot blue"></i>เฝ้าระวัง</button>
+          <button type="button" data-criteria="green"><i class="filter-dot green"></i>ติดตาม</button>
         </div>
       </header>
 
       <section class="detail-summary-grid high-peak-summary-grid" aria-label="สรุปตัวเลขสถานการณ์ลุ่มน้ำ">
-        <article class="critical"><span>CCTV ที่เข้าเกณฑ์</span><b id="summaryStationTotal">16 จุด</b><small id="summaryStationBreakdown">ต้องอพยพ 6 · อพยพ 4 · เตรียมรับมือ 6</small></article>
+        <article class="critical"><span>CCTV ที่เข้าเกณฑ์</span><b id="summaryStationTotal">16 จุด</b><small id="summaryStationBreakdown">ต้องอพยพ 6 · อพยพ 4 · เตรียมรับมือ 2 · เฝ้าระวัง 2 · ติดตาม 2</small></article>
         <article><span>High Peak สูงสุด</span><b id="summaryHighPeakValue">8.42 ม.</b><small id="summaryHighPeakNote">NAN01 · เกินเกณฑ์ +0.62 ม.</small></article>
         <article><span>แนวโน้มเพิ่มสูงสุด</span><b id="summaryTrendValue">+0.38 ม./ชม.</b><small id="summaryTrendNote">NAN01 · สะพานปอน</small></article>
         <article><span>ข้อมูลล่าสุด</span><b>10:40 น.</b><small>28/08/2569 · อัปเดตทุก 5 นาที</small></article>
@@ -80,11 +82,11 @@
         <div class="top-risk-heading">
           <div class="top-risk-title"><p>TOP RISK CCTV</p><h2>CCTV ความเสี่ยงสูงสุด</h2><strong id="topRiskHeadline"><i class="filter-dot red"></i>ต้องอพยพ 6 จุด <small>· แสดงครบทุกสถานี</small></strong><span class="top-risk-scope" id="topRiskScope">ทุกจังหวัด · 16 สถานี</span></div>
           <div class="top-risk-side">
-            <div class="risk-summary" id="riskSummary" aria-label="สรุปจำนวน CCTV ตามระดับความเสี่ยง"><span class="red"><i></i>แดง <b>6</b></span><span class="orange"><i></i>ส้ม <b>4</b></span><span class="yellow"><i></i>เหลือง <b>6</b></span></div>
+            <div class="risk-summary" id="riskSummary" aria-label="สรุปจำนวน CCTV ตามระดับความเสี่ยง"><span class="red"><i></i>ต้องอพยพ <b>6</b></span><span class="orange"><i></i>อพยพ <b>4</b></span><span class="yellow"><i></i>เตรียมรับมือ <b>2</b></span><span class="blue"><i></i>เฝ้าระวัง <b>2</b></span><span class="green"><i></i>ติดตาม <b>2</b></span></div>
             <span class="all-visible-count">แสดงทั้งหมด <small id="basinStationCount">16 จุด</small></span>
           </div>
         </div>
-        <p class="station-table-note" id="basinStationNote">แสดงทุกสถานีตั้งแต่ระดับเตรียมรับมือขึ้นไป เรียงตามระดับความเสี่ยงและค่าที่เกินเกณฑ์</p>
+        <p class="station-table-note" id="basinStationNote">แสดงทุกสถานีครบ 5 ระดับตามตัวกรอง เรียงตามระดับความเสี่ยงและค่าที่เกินเกณฑ์</p>
         <div class="table-wrap basin-station-table-wrap">
           <table class="data-table basin-station-table">
             <thead><tr><th>ลำดับ</th><th>CCTV / สถานี</th><th>ระดับน้ำ</th><th>ระดับตลิ่ง</th><th>เวลาล่าสุด</th><th>ระดับเตือนภัย</th><th>สถานะกล้อง</th></tr></thead>
@@ -94,7 +96,7 @@
       </section>
 
       <section class="station-section basin-all-stations-section">
-        <div class="section-heading compact station-summary-heading"><div><p>STATION SUMMARY</p><h2>ตารางสรุปสถานีในลุ่มน้ำ</h2></div><div class="station-summary-tools"><div class="station-summary-metric"><span>สถานีตามตัวกรอง</span><b id="basinAllStationCount">16 จุด</b><small id="stationSummaryBreakdown">ต้องอพยพ 6 · อพยพ 4 · เตรียมรับมือ 6 · เฝ้าระวัง 0 · ติดตาม 0</small></div><label><span>เรียงข้อมูล</span><select id="stationSort"><option value="province">รหัสสถานี 01 → 10 (แยกจังหวัด)</option><option value="severity">ระดับเกณฑ์ สูง → ต่ำ</option></select></label></div></div>
+        <div class="section-heading compact station-summary-heading"><div><p>STATION SUMMARY</p><h2>ตารางสรุปสถานีในลุ่มน้ำ</h2></div><div class="station-summary-tools"><div class="station-summary-metric"><span>สถานีตามตัวกรอง</span><b id="basinAllStationCount">16 จุด</b><small id="stationSummaryBreakdown">ต้องอพยพ 6 · อพยพ 4 · เตรียมรับมือ 2 · เฝ้าระวัง 2 · ติดตาม 2</small></div><label><span>เรียงข้อมูล</span><select id="stationSort"><option value="province">รหัสสถานี 01 → 10 (แยกจังหวัด)</option><option value="severity">ระดับเกณฑ์ สูง → ต่ำ</option></select></label></div></div>
         <p class="station-table-note">แสดงทุกสถานีครบ 5 ระดับตามตัวกรองจังหวัด ค่าเริ่มต้นเรียงรหัสสถานีภายในแต่ละจังหวัด</p>
         <div class="table-wrap basin-all-station-table-wrap">
           <table class="data-table basin-all-station-table">

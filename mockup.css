@@ -194,3 +194,14 @@ button,a{outline-offset:3px}
 .station-status.blue{color:#3177b8}.station-status.blue:before{background:#56a9e8}.station-status.green{color:#16835d}.station-status.green:before{background:#2fc88f}
 .basin-water-value.blue{background:#e8f4ff;color:#3177b8}.basin-water-value.green{background:#e7f8f1;color:#16835d}.difference-value.blue,.trend-value.blue{color:#3177b8}.difference-value.green,.trend-value.green{color:#16835d}
 .basin-all-station-table{min-width:1040px}
+
+/* v1.1.2: all five CCTV levels and aligned risk tables */
+.filter-dot.blue{background:#56a9e8}.filter-dot.green{background:#2fc88f}
+.status-badge.blue{background:#e8f4ff;color:#3177b8}.status-badge.green{background:#e7f8f1;color:#16835d}
+.risk-summary span.blue i{background:#56a9e8}.risk-summary span.green i{background:#2fc88f}
+.risk-summary span{min-width:76px;padding-left:7px;padding-right:7px;font-size:7px}
+.top-risk-section{padding:11px;overflow:visible}
+.top-risk-section .top-risk-heading{padding:0 0 10px;background:transparent}
+.top-risk-section .station-table-note{margin:-3px 0 9px}
+.top-risk-section .basin-station-table-wrap{max-height:275px;min-height:215px;overflow:auto;border:1px solid #e5e7ed;border-radius:7px}
+.top-risk-section .basin-station-table{min-width:1040px}

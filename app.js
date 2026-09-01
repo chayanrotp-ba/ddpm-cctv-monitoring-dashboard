@@ -10,8 +10,8 @@
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version 1.1.1";
-    badge.title = "Patch version: v1.1.1 · baseline: v1.0-baseline";
+    badge.textContent = "Version 1.1.2";
+    badge.title = "Patch version: v1.1.2 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -146,7 +146,7 @@
     const stationRecords = detailStationRecords(detail);
     const severityOrder = { red:5, orange:4, yellow:3, blue:2, green:1 };
     const severityLabels = { red:"ต้องอพยพ", orange:"อพยพ", yellow:"เตรียมรับมือ", blue:"เฝ้าระวัง", green:"ติดตาม" };
-    const alertSeverities = ["red","orange","yellow"];
+    const alertSeverities = ["red","orange","yellow","blue","green"];
     const summarySeverities = ["red","orange","yellow","blue","green"];
     let activeProvince = "all";
     let activeCriteria = "all";
@@ -237,7 +237,7 @@
       if (highPeakValue) highPeakValue.textContent = highestStation ? `${Number(highestStation.level).toFixed(2)} ม.` : "—";
       if (highPeakNote) highPeakNote.textContent = highestStation ? `${highestStation.code} · เกินเกณฑ์ +${stationExcess(highestStation).toFixed(2)} ม.` : "ไม่พบข้อมูลตามตัวกรอง";
       if (summaryStationTotal) summaryStationTotal.textContent = `${topStations.length} จุด`;
-      if (summaryStationBreakdown) summaryStationBreakdown.textContent = `ต้องอพยพ ${stationCounts.red} · อพยพ ${stationCounts.orange} · เตรียมรับมือ ${stationCounts.yellow}`;
+      if (summaryStationBreakdown) summaryStationBreakdown.textContent = summarySeverities.map(severity => `${severityLabels[severity]} ${stationCounts[severity]}`).join(" · ");
       if (summaryTrendValue) summaryTrendValue.textContent = fastestStation ? `${Number(fastestStation.trend) >= 0 ? "+" : ""}${Number(fastestStation.trend).toFixed(2)} ม./ชม.` : "—";
       if (summaryTrendNote) summaryTrendNote.textContent = fastestStation ? `${fastestStation.code} · ${fastestStation.name}` : "ไม่พบข้อมูลตามตัวกรอง";
       const topRiskHeadline = $("#topRiskHeadline");
@@ -552,10 +552,10 @@
       {code:"NAN05",name:"สะพานสันติสุข",province:"น่าน",district:"สันติสุข",subdistrict:"ดู่พงษ์",level:"6.88",bank:"6.68",trend:"+0.09",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[100.928700,19.087500]},
       {code:"NAN06",name:"สะพานเมืองวังศรีเสถียรพัฒนา",province:"น่าน",district:"ท่าวังผา",subdistrict:"ริม",level:"6.86",bank:"6.70",trend:"+0.19",severity:"orange",statusLabel:"อพยพ",coordinate:[100.795500,18.902500]},
       {code:"NAN07",name:"ใต้สะพานพัฒนาภาคเหนือ",province:"น่าน",district:"เมืองน่าน",subdistrict:"ในเวียง",level:"7.95",bank:"7.47",trend:"+0.31",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[100.779100,18.775100]},
-      {code:"NAN08",name:"สะพานน้ำลานบ้านวังแดง",province:"น่าน",district:"เวียงสา",subdistrict:"กลางเวียง",level:"4.41",bank:"4.25",trend:"+0.04",severity:"yellow",statusLabel:"เฝ้าระวัง",coordinate:[100.717000,18.583300]},
-      {code:"NAN09",name:"สะพานเวียงสา",province:"น่าน",district:"เวียงสา",subdistrict:"ไหล่น่าน",level:"4.28",bank:"4.10",trend:"+0.03",severity:"yellow",statusLabel:"เฝ้าระวัง",coordinate:[100.755400,18.570100]},
-      {code:"NAN10",name:"สะพานร่วมใจสามัคคี",province:"น่าน",district:"บ่อเกลือ",subdistrict:"ดงพญา",level:"4.16",bank:"4.70",trend:"+0.02",severity:"yellow",statusLabel:"เฝ้าระวัง",coordinate:[101.203400,19.194000]},
-      {code:"UTT01",name:"จุดตรวจวัด UTT01",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"4.92",bank:"5.20",trend:"+0.06",severity:"yellow",statusLabel:"เฝ้าระวัง",coordinate:[101.105100,18.294050]},
+      {code:"NAN08",name:"สะพานน้ำลานบ้านวังแดง",province:"น่าน",district:"เวียงสา",subdistrict:"กลางเวียง",level:"4.41",bank:"4.25",trend:"+0.04",severity:"blue",statusLabel:"เฝ้าระวัง",coordinate:[100.717000,18.583300]},
+      {code:"NAN09",name:"สะพานเวียงสา",province:"น่าน",district:"เวียงสา",subdistrict:"ไหล่น่าน",level:"4.28",bank:"4.10",trend:"+0.03",severity:"green",statusLabel:"ติดตาม",coordinate:[100.755400,18.570100]},
+      {code:"NAN10",name:"สะพานร่วมใจสามัคคี",province:"น่าน",district:"บ่อเกลือ",subdistrict:"ดงพญา",level:"4.16",bank:"4.70",trend:"+0.02",severity:"blue",statusLabel:"เฝ้าระวัง",coordinate:[101.203400,19.194000]},
+      {code:"UTT01",name:"จุดตรวจวัด UTT01",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"4.92",bank:"5.20",trend:"+0.06",severity:"green",statusLabel:"ติดตาม",coordinate:[101.105100,18.294050]},
       {code:"UTT02",name:"จุดตรวจวัด UTT02",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"6.38",bank:"6.10",trend:"+0.12",severity:"orange",statusLabel:"อพยพ",coordinate:[101.103200,18.126400]},
       {code:"UTT03",name:"จุดตรวจวัด UTT03",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"7.36",bank:"7.10",trend:"+0.24",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[101.035800,18.146500]},
       {code:"UTT04",name:"จุดตรวจวัด UTT04",province:"อุตรดิตถ์",district:"—",subdistrict:"—",level:"7.82",bank:"7.40",trend:"+0.31",severity:"red",statusLabel:"ต้องอพยพ",coordinate:[100.305189,17.763709]},
@@ -739,8 +739,19 @@
 
   function cctvMarkerUrl(severity) {
     if (window.CCTV_MARKER_URLS?.[severity]) return window.CCTV_MARKER_URLS[severity];
-    const name = severity === "red" ? "CCTV_WATER_SUPERCRITICAL.svg" : severity === "orange" ? "CCTV_WATER_DANGER.svg" : "CCTV_WATER_HIGH.svg";
+    const markerNames = {
+      red:"CCTV_WATER_SUPERCRITICAL.svg",
+      orange:"CCTV_WATER_DANGER.svg",
+      yellow:"CCTV_WATER_HIGH.svg",
+      blue:"CCTV_WATER_MEDIUM.svg",
+      green:"CCTV_WATER_LOW.svg"
+    };
+    const name = markerNames[severity] || markerNames.green;
     return `https://cctv.disaster.go.th/images/cctv-station-markers/${name}`;
+  }
+
+  function waterSeverityLabel(severity) {
+    return ({red:"ต้องอพยพ",orange:"อพยพ",yellow:"เตรียมรับมือ",blue:"เฝ้าระวัง",green:"ติดตาม"})[severity] || "ไม่ระบุ";
   }
 
   function renderFallbackBasins() {
@@ -819,7 +830,7 @@
 
   function sensorMarkerDataUri(type, severity) {
     if (type === "rain") return new URL(RAIN_SENSOR_ICON, window.location.href).href;
-    const color = severity === "red" ? "#ff0000" : severity === "orange" ? "#E86011" : "#F4D439";
+    const color = ({red:"#ff0000",orange:"#E86011",yellow:"#F4D439",blue:"#56a9e8",green:"#2fc88f"})[severity] || "#2fc88f";
     const shape = '<path d="M20 4 4 34h32Z" fill="' + color + '" stroke="#5d6672" stroke-width="2" stroke-linejoin="round"/>';
     return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">${shape}</svg>`)}`;
   }
@@ -857,7 +868,7 @@
         if (!(drilldown.cctv || []).length) drilldown.stations.map((station,index) => [...drilldown.route[routeIndexes[index]],station]).forEach(([longitude,latitude,station]) => stationLayer.add(new Graphic({
           geometry:{type:"point",longitude,latitude},
           symbol:{type:"simple-marker",color:station.severity === "red" ? "#e34b4b" : station.severity === "orange" ? "#f28a2e" : "#f4c430",size:13,outline:{color:"#fff",width:2}},
-          attributes:{code:station.code,category:"station",severity:station.severity,province:station.province},popupTemplate:{title:`${station.code} · ${station.name}`,content:`ต.${station.subdistrict} อ.${station.district} จ.${station.province}<br><b>ระดับน้ำ ${station.level} เมตร</b><br>สถานะ ${station.severity === "red" ? "ต้องอพยพ" : station.severity === "orange" ? "อพยพ" : "เตรียมรับมือ"}`}
+          attributes:{code:station.code,category:"station",severity:station.severity,province:station.province},popupTemplate:{title:`${station.code} · ${station.name}`,content:`ต.${station.subdistrict} อ.${station.district} จ.${station.province}<br><b>ระดับน้ำ ${station.level} เมตร</b><br>สถานะ ${waterSeverityLabel(station.severity)}`}
         })));
         (drilldown.sensors || []).forEach(sensor => stationLayer.add(new Graphic({
           geometry:{type:"point",longitude:sensor.coordinate[0],latitude:sensor.coordinate[1]},
@@ -867,7 +878,7 @@
         (drilldown.cctv || []).forEach(camera => stationLayer.add(new Graphic({
           geometry:{type:"point",longitude:camera.coordinate[0],latitude:camera.coordinate[1]},
           symbol:{type:"picture-marker",url:cctvMarkerUrl(camera.severity),width:28,height:28,xoffset:0,yoffset:10},
-          attributes:{code:camera.code,category:"cctv",severity:camera.severity,province:camera.province},popupTemplate:{title:`${camera.code} · ${camera.name}`,content:`ต.${camera.subdistrict} อ.${camera.district} จ.${camera.province}<br><b>ระดับน้ำ ${camera.level} เมตร</b> · ระดับตลิ่ง ${camera.bank} เมตร<br><b>ระดับสถานการณ์ ${camera.severity === "red" ? "ต้องอพยพ" : camera.severity === "orange" ? "อพยพ" : "เตรียมรับมือ"}</b>`}
+          attributes:{code:camera.code,category:"cctv",severity:camera.severity,province:camera.province},popupTemplate:{title:`${camera.code} · ${camera.name}`,content:`ต.${camera.subdistrict} อ.${camera.district} จ.${camera.province}<br><b>ระดับน้ำ ${camera.level} เมตร</b> · ระดับตลิ่ง ${camera.bank} เมตร<br><b>ระดับสถานการณ์ ${waterSeverityLabel(camera.severity)}</b>`}
         })));
       }
 
