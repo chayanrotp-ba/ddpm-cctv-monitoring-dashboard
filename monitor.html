@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Mockup เมนูสืบค้นข้อมูลและสถานะอุปกรณ์สำหรับเจ้าหน้าที่เทคนิค">
+  <title>สืบค้นข้อมูลและสถานะอุปกรณ์ — DDPM CCTV Mockup</title>
+  <link rel="preconnect" href="https://js.arcgis.com">
+  <link rel="stylesheet" href="https://js.arcgis.com/4.31/esri/themes/light/main.css">
+  <link rel="stylesheet" href="mockup.css">
+</head>
+<body class="mockup-body" data-page="monitor">
+  <main class="system-shell monitor-shell">
+    <section class="map-pane monitor-map" aria-label="แผนที่สถานีทั้งหมด">
+      <div class="map-fallback monitor-fallback" aria-hidden="true">
+        <svg viewBox="0 0 620 900" preserveAspectRatio="xMidYMid slice">
+          <defs><pattern id="monitorRoads" width="70" height="70" patternUnits="userSpaceOnUse" patternTransform="rotate(12)"><path d="M0 12H70 M0 54H70 M22 0V70" fill="none" stroke="#ddd8ce" stroke-width="1.4"/></pattern></defs>
+          <rect width="620" height="900" fill="#f4f2ec"/><rect width="620" height="900" fill="url(#monitorRoads)"/>
+          <path class="river-line" d="M314 22 C294 122 348 170 310 269 C284 334 336 405 303 497 C273 580 332 643 300 735 C284 787 310 839 327 886"/>
+          <g class="monitor-points"><circle class="online" cx="300" cy="136" r="9"/><circle class="warning" cx="359" cy="250" r="10"/><circle class="offline" cx="255" cy="358" r="9"/><circle class="online" cx="340" cy="470" r="9"/><circle class="online" cx="245" cy="596" r="9"/><circle class="warning" cx="358" cy="694" r="10"/><circle class="online" cx="309" cy="792" r="9"/></g>
+        </svg>
+      </div>
+      <div id="viewDiv" class="map-canvas" data-map-mode="monitor"></div>
+      <div class="map-loading-overlay" role="status" aria-live="polite">
+        <i aria-hidden="true"></i>
+        <b>กำลังโหลดแผนที่</b>
+        <span>กำลังเชื่อมต่อข้อมูลแผนที่และขอบเขตพื้นที่</span>
+      </div>
+      <div class="map-title-card surface"><span class="agency-mark">ปภ.</span><span><b>สถานีตรวจวัดทั้งหมด</b><small>ออนไลน์ 164 · ล่าช้า 2 · ออฟไลน์ 14 จุด</small></span></div>
+      <div class="map-tools surface"><button id="homeBtn" type="button">⌂</button><button id="zoomIn" type="button">＋</button><button id="zoomOut" type="button">−</button></div>
+      <div class="map-legend surface"><b>สถานะอุปกรณ์</b><span><i class="dot green"></i>ออนไลน์</span><span><i class="dot orange"></i>ข้อมูลล่าช้า</span><span><i class="dot gray-dark"></i>ออฟไลน์</span></div>
+      <div class="mock-label surface">ข้อมูลจำลองเพื่อยืนยันแนวทาง</div>
+    </section>
+
+    <section class="content-pane monitor-content">
+      <header class="monitor-header">
+        <div><p>DATA QUERY & STATUS MONITOR</p><h1>สืบค้นข้อมูลและสถานะอุปกรณ์</h1><span>สำหรับทีมมอนิเตอร์ระบบและเจ้าหน้าที่เทคนิค</span></div>
+        <button class="export-button" id="exportCsv" type="button">⇩ ส่งออก CSV</button>
+      </header>
+
+      <nav class="monitor-tabs" aria-label="ประเภทข้อมูล">
+        <button class="active" type="button" data-monitor-tab="status">สถานะอุปกรณ์ <b>180</b></button>
+        <button type="button" data-monitor-tab="water">ข้อมูลระดับน้ำ</button>
+        <button type="button" data-monitor-tab="history">ข้อมูลย้อนหลังและ Ranking</button>
+      </nav>
+
+      <section class="monitor-panel active" data-monitor-panel="status">
+        <div class="monitor-filters">
+          <label class="search-control"><span>⌕</span><input id="monitorSearch" type="search" placeholder="ค้นหารหัสสถานี ชื่อ หรือจังหวัด"></label>
+          <select id="deviceStatus"><option value="all">ทุกสถานะ</option><option value="online">ออนไลน์</option><option value="delay">ข้อมูลล่าช้า</option><option value="offline">ออฟไลน์</option></select>
+          <select><option>ทุกลุ่มน้ำ</option><option>ลุ่มน้ำน่าน</option><option>ลุ่มน้ำยม</option><option>ลุ่มน้ำชี</option></select>
+          <button id="monitorRefresh" type="button">↻ รีเฟรช</button>
+        </div>
+        <div class="monitor-live"><span class="pulse-dot"></span><b>กำลังเชื่อมต่อสถานี 180 จุด</b><small>อัปเดตล่าสุด <time id="clock">--:--:--</time></small></div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>สถานะ</th><th>รหัสสถานี</th><th>ชื่อสถานี</th><th>ลุ่มน้ำ/จังหวัด</th><th>การสื่อสาร</th><th>ข้อมูลล่าสุด</th><th>อัปเดตล่าสุด</th><th></th></tr></thead>
+            <tbody id="deviceTable">
+              <tr data-device-status="online" data-search="NAN01 สะพานปอน น่าน"><td><span class="device-dot online"></span></td><td><b>NAN01</b></td><td>สะพานปอน</td><td>น่าน · น่าน</td><td><span class="status-pill online">ออนไลน์</span></td><td>8.42 ม.</td><td>1 นาทีที่แล้ว</td><td><button class="row-action">•••</button></td></tr>
+              <tr data-device-status="online" data-search="UTT05 จุดตรวจวัด UTT05 อุตรดิตถ์"><td><span class="device-dot online"></span></td><td><b>UTT05</b></td><td>จุดตรวจวัด UTT05</td><td>น่าน · อุตรดิตถ์</td><td><span class="status-pill online">ออนไลน์</span></td><td>6.12 ม.</td><td>2 นาทีที่แล้ว</td><td><button class="row-action">•••</button></td></tr>
+              <tr data-device-status="delay" data-search="NAN03 สะพานบ้านป่าหัด น่าน"><td><span class="device-dot delay"></span></td><td><b>NAN03</b></td><td>สะพานบ้านป่าหัด</td><td>น่าน · น่าน</td><td><span class="status-pill delay">ข้อมูลล่าช้า</span></td><td>7.10 ม.</td><td>18 นาทีที่แล้ว</td><td><button class="row-action">•••</button></td></tr>
+              <tr data-device-status="offline" data-search="YOM-04 ประตูระบายน้ำบ้านกง สุโขทัย"><td><span class="device-dot offline"></span></td><td><b>YOM-04</b></td><td>ประตูระบายน้ำบ้านกง</td><td>ยม · สุโขทัย</td><td><span class="status-pill offline">ออฟไลน์</span></td><td>—</td><td>1 ชม. 24 นาที</td><td><button class="row-action">•••</button></td></tr>
+              <tr data-device-status="online" data-search="CHI-07 สะพานมหาสารคาม มหาสารคาม"><td><span class="device-dot online"></span></td><td><b>CHI-07</b></td><td>สะพานมหาสารคาม</td><td>ชี · มหาสารคาม</td><td><span class="status-pill online">ออนไลน์</span></td><td>4.96 ม.</td><td>1 นาทีที่แล้ว</td><td><button class="row-action">•••</button></td></tr>
+              <tr data-device-status="online" data-search="CPY-12 สะพานเดชาติวงศ์ นครสวรรค์"><td><span class="device-dot online"></span></td><td><b>CPY-12</b></td><td>สะพานเดชาติวงศ์</td><td>เจ้าพระยา · นครสวรรค์</td><td><span class="status-pill online">ออนไลน์</span></td><td>4.82 ม.</td><td>3 นาทีที่แล้ว</td><td><button class="row-action">•••</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <footer class="table-footer"><span id="deviceResult">แสดง 6 จาก 180 สถานี</span><div><button>‹</button><button class="active">1</button><button>2</button><button>3</button><button>…</button><button>30</button><button>›</button></div></footer>
+      </section>
+
+      <section class="monitor-panel" data-monitor-panel="water">
+        <div class="monitor-filters"><label class="search-control"><span>⌕</span><input type="search" placeholder="ค้นหาสถานีตรวจวัดระดับน้ำ"></label><select><option>ทุกระดับสถานการณ์</option><option>ปกติ</option><option>เฝ้าระวัง</option><option>อพยพ</option><option>ต้องอพยพ</option></select><select><option>เรียงตามระดับน้ำสูงสุด</option></select><button type="button">↻ รีเฟรช</button></div>
+        <div class="table-wrap"><table class="data-table water-table"><thead><tr><th>อันดับ</th><th>รหัสสถานี</th><th>ชื่อสถานี</th><th>ระดับน้ำ</th><th>ระดับตลิ่ง</th><th>ส่วนต่าง</th><th>แนวโน้ม</th><th>สถานการณ์</th></tr></thead><tbody>
+          <tr><td>1</td><td><b>NAN01</b></td><td>สะพานปอน</td><td><b>8.42 ม.</b></td><td>7.80 ม.</td><td class="red-text">+0.62 ม.</td><td class="red-text">↑ 0.38</td><td><span class="status-badge red">ต้องอพยพ</span></td></tr>
+          <tr><td>2</td><td><b>NAN07</b></td><td>ใต้สะพานพัฒนาภาคเหนือ</td><td><b>7.95 ม.</b></td><td>7.47 ม.</td><td class="red-text">+0.48 ม.</td><td class="red-text">↑ 0.31</td><td><span class="status-badge red">ต้องอพยพ</span></td></tr>
+          <tr><td>3</td><td><b>UTT04</b></td><td>จุดตรวจวัด UTT04</td><td><b>7.82 ม.</b></td><td>7.40 ม.</td><td class="red-text">+0.42 ม.</td><td class="red-text">↑ 0.31</td><td><span class="status-badge red">ต้องอพยพ</span></td></tr>
+          <tr><td>4</td><td><b>NAN03</b></td><td>สะพานบ้านป่าหัด</td><td><b>7.10 ม.</b></td><td>6.78 ม.</td><td class="red-text">+0.32 ม.</td><td class="red-text">↑ 0.18</td><td><span class="status-badge red">ต้องอพยพ</span></td></tr>
+          <tr><td>5</td><td><b>UTT03</b></td><td>จุดตรวจวัด UTT03</td><td><b>7.36 ม.</b></td><td>7.10 ม.</td><td class="red-text">+0.26 ม.</td><td class="red-text">↑ 0.24</td><td><span class="status-badge red">ต้องอพยพ</span></td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section class="monitor-panel" data-monitor-panel="history">
+        <div class="history-layout">
+          <article class="history-chart-card"><div class="chart-toolbar"><div><small>สถานีที่เลือก</small><b>NAN01 · สะพานปอน</b></div><div><button class="active">24 ชม.</button><button>7 วัน</button><button>30 วัน</button></div></div><div class="history-chart"><span class="threshold-line">เกณฑ์ต้องอพยพ 7.80 ม.</span><svg viewBox="0 0 760 260" preserveAspectRatio="none"><defs><linearGradient id="historyArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4e61f6" stop-opacity=".25"/><stop offset="1" stop-color="#4e61f6" stop-opacity="0"/></linearGradient></defs><g class="grid-lines"><path d="M0 52H760 M0 104H760 M0 156H760 M0 208H760"/></g><path class="history-area" d="M0 228 C75 219 104 214 152 202 C221 184 238 187 304 165 C371 144 389 151 456 122 C523 92 558 99 608 68 C670 31 706 35 760 18 L760 260 L0 260 Z"/><path class="history-line" d="M0 228 C75 219 104 214 152 202 C221 184 238 187 304 165 C371 144 389 151 456 122 C523 92 558 99 608 68 C670 31 706 35 760 18"/></svg><div class="chart-axis"><span>00:00</span><span>04:00</span><span>08:00</span><span>12:00</span><span>16:00</span><span>20:00</span><span>ขณะนี้</span></div></div></article>
+          <aside class="ranking-card"><div><p>RANKING</p><h2>ระดับน้ำเพิ่มเร็วที่สุด</h2></div><ol><li><span>1</span><div><b>NAN01</b><small>ลุ่มน้ำน่าน</small></div><strong class="red-text">+0.38</strong></li><li><span>2</span><div><b>NAN07</b><small>ลุ่มน้ำน่าน</small></div><strong class="red-text">+0.31</strong></li><li><span>3</span><div><b>UTT04</b><small>ลุ่มน้ำน่าน</small></div><strong class="red-text">+0.31</strong></li><li><span>4</span><div><b>UTT03</b><small>ลุ่มน้ำน่าน</small></div><strong class="red-text">+0.24</strong></li></ol></aside>
+        </div>
+      </section>
+    </section>
+
+    <nav class="footer-navigation surface" aria-label="เมนูหลัก">
+      <a href="index.html"><span>⌂</span><b>หน้าหลัก</b></a>
+      <a href="basin.html"><span>♒</span><b>เส้นทางน้ำ</b></a>
+      <a class="active" href="monitor.html" aria-current="page"><span>◕</span><b>มอนิเตอร์</b></a>
+    </nav>
+  </main>
+  <script src="data/onwr-basins-22.js"></script>
+  <script src="https://js.arcgis.com/4.31/"></script>
+  <script src="app.js"></script>
+</body>
+</html>
