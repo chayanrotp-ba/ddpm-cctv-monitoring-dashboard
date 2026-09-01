@@ -211,7 +211,8 @@ button,a{outline-offset:3px}
 .table-sort-button:after{content:"↕";color:#8f96a5;font-size:7px;font-weight:500}.table-sort-button.active.asc:after{content:"↑";color:var(--primary)}.table-sort-button.active.desc:after{content:"↓";color:var(--primary)}
 .table-sort-button:hover,.table-sort-button:focus-visible{color:var(--primary);outline:none;text-decoration:underline;text-underline-offset:2px}
 
-/* Make all five station-summary criteria immediately visible */
-.station-summary-risk{flex:1;min-width:390px}.station-summary-risk span{flex:1;min-width:72px}
+/* Keep both station-summary controls on the same visual scale */
+.station-summary-risk{flex:0 0 auto;min-width:0}.station-summary-risk span{min-width:76px}
+.station-summary-metric{display:grid;place-items:center;min-width:74px;width:auto;height:34px;padding:4px 10px;text-align:center}.station-summary-metric b{font-size:11px}.station-summary-metric small{color:var(--primary)}
 .station-summary-heading>div:first-child{flex:0 0 auto}.station-summary-heading .station-summary-tools{flex:1;justify-content:flex-end}
-@media(max-width:1050px){.station-summary-heading .station-summary-tools{flex-direction:column}.station-summary-risk{width:100%;min-width:0}.station-summary-metric{width:100%}}
+@media(max-width:1050px){.station-summary-heading .station-summary-tools{flex-direction:column}.station-summary-risk{width:100%;min-width:0}.station-summary-risk span{flex:1;min-width:0}.station-summary-metric{width:100%}}
