@@ -10,8 +10,8 @@
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version baseline";
-    badge.title = "Git version: v1.0-baseline";
+    badge.textContent = "Version 1.1.0";
+    badge.title = "Minor version: v1.1.0 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -145,9 +145,10 @@
     const detail = basinDrilldowns[selectedBasinCode] || basinDrilldowns["09"];
     const stationRecords = detailStationRecords(detail);
     const severityOrder = { red:3, orange:2, yellow:1 };
-    const severityLabels = { red:"ต้องอพยพ", orange:"อพยพ", yellow:"เฝ้าระวัง" };
+    const severityLabels = { red:"ต้องอพยพ", orange:"อพยพ", yellow:"เตรียมรับมือ" };
     let activeProvince = "all";
     let activeCriteria = "all";
+    let activeSensorType = "rain";
     const provinceOf = item => item.province || (item.area || "").replace("จังหวัด", "").replace(/^(ต้นน้ำ|กลางน้ำ|ท้ายน้ำ)\s*·\s*/, "").trim();
     const matchesFilters = item => (activeProvince === "all" || provinceOf(item) === activeProvince) && (activeCriteria === "all" || item.severity === activeCriteria);
     const normalizeCode = code => String(code || "").replace(/-/g, "").toUpperCase();
@@ -165,6 +166,7 @@
     const allStationsDrawer = $("#allStationsDrawer");
     const allStationsBackdrop = $("#allStationsBackdrop");
     const allStationRows = $("#allStationRows");
+    const sensorTableRows = $("#sensorTableRows");
     let latestRankedStations = [];
     const stationLocationText = station => [
       station.subdistrict && station.subdistrict !== "—" ? `ต.${station.subdistrict}` : "",
@@ -179,12 +181,16 @@
       const tools = includeTools ? `<td><div class="station-tools"><button class="station-tool" type="button" data-station-action="history" data-station-code="${station.code}" title="กราฟระดับน้ำย้อนหลัง" aria-label="กราฟระดับน้ำย้อนหลัง ${station.code}">⌁</button><button class="station-tool" type="button" data-station-action="analysis" data-station-code="${station.code}" title="ผลวิเคราะห์ระดับน้ำ" aria-label="ผลวิเคราะห์ระดับน้ำ ${station.code}">▣</button></div></td>` : "";
       return `<tr data-focus-station="${station.code}" tabindex="0" role="button" aria-label="เลื่อนไปยัง ${station.code} บนแผนที่"><td>${index + 1}</td><td><b>${station.code} · ${station.name}</b><small>${location}</small></td><td><span class="basin-water-value ${station.severity}">${level.toFixed(2)} ม.</span></td><td><b class="difference-value ${station.severity}">+${difference.toFixed(2)} ม.</b></td><td><span class="trend-value ${station.severity}">${direction} ${Math.abs(Number(station.trend)).toFixed(2)} ม./ชม.</span></td><td><span class="station-status ${station.severity}">${severityLabels[station.severity]}</span></td>${tools}</tr>`;
     };
+    const topRiskRowMarkup = (station,index) => {
+      const cameraState = station.code === "NAN03" ? {label:"ข้อมูลล่าช้า",className:"delay",time:"10:22 น."} : {label:"ออนไลน์",className:"online",time:"10:40 น."};
+      return `<tr data-focus-station="${station.code}" tabindex="0" role="button" aria-label="เลื่อนไปยัง ${station.code} บนแผนที่"><td>${index + 1}</td><td><b>${station.code} · ${station.name}</b><small>${stationLocationText(station)}</small></td><td><span class="basin-water-value ${station.severity}">${Number(station.level).toFixed(2)} ม.</span></td><td><span class="bank-value">${stationBank(station).toFixed(2)} ม.</span></td><td><time>${cameraState.time}</time></td><td><span class="station-status ${station.severity}">${severityLabels[station.severity]}</span></td><td><span class="camera-health ${cameraState.className}"><i></i>${cameraState.label}</span></td></tr>`;
+    };
     const fullStationRowMarkup = (station,index) => {
       const level = Number(station.level);
       const bank = stationBank(station);
       const difference = stationExcess(station);
       const direction = Number(station.trend) > 0 ? "↑" : Number(station.trend) < 0 ? "↓" : "−";
-      return `<tr data-focus-station="${station.code}" tabindex="0" role="button" aria-label="เลื่อนไปยัง ${station.code} บนแผนที่"><td>${index + 1}</td><td><b>${station.code}</b></td><td><b>${station.name}</b><small>${stationLocationText(station)}</small></td><td><span class="basin-water-value ${station.severity}">${level.toFixed(2)} ม.</span></td><td><span class="bank-value">${bank.toFixed(2)} ม.</span></td><td><b class="difference-value ${station.severity}">+${difference.toFixed(2)} ม.</b></td><td><span class="trend-value ${station.severity}">${direction} ${Math.abs(Number(station.trend)).toFixed(2)} ม./ชม.</span></td><td><time>28/08/2569 10:40 น.</time></td><td><div class="station-tools"><button class="station-tool" type="button" data-station-action="history" data-station-code="${station.code}" title="กราฟระดับน้ำย้อนหลัง" aria-label="กราฟระดับน้ำย้อนหลัง ${station.code}">⌁</button><button class="station-tool" type="button" data-station-action="analysis" data-station-code="${station.code}" title="ผลวิเคราะห์ระดับน้ำ" aria-label="ผลวิเคราะห์ระดับน้ำ ${station.code}">▣</button></div></td></tr>`;
+      return `<tr data-focus-station="${station.code}" tabindex="0" role="button" aria-label="เลื่อนไปยัง ${station.code} บนแผนที่"><td>${index + 1}</td><td><b>${station.code} · ${station.name}</b><small>${stationLocationText(station)}</small></td><td><span class="basin-water-value ${station.severity}">${level.toFixed(2)} ม.</span></td><td><span class="bank-value">${bank.toFixed(2)} ม.</span></td><td><b class="difference-value ${station.severity}">+${difference.toFixed(2)} ม.</b></td><td><span class="trend-value ${station.severity}">${direction} ${Math.abs(Number(station.trend)).toFixed(2)} ม./ชม.</span></td><td><time>28/08/2569 10:40 น.</time></td><td><div class="station-tools"><button class="station-tool" type="button" data-station-action="history" data-station-code="${station.code}" title="กราฟระดับน้ำย้อนหลัง" aria-label="กราฟระดับน้ำย้อนหลัง ${station.code}">⌁</button><button class="station-tool" type="button" data-station-action="analysis" data-station-code="${station.code}" title="ผลวิเคราะห์ระดับน้ำ" aria-label="ผลวิเคราะห์ระดับน้ำ ${station.code}">▣</button></div></td></tr>`;
     };
     const renderAllStations = () => {
       if (allStationRows) allStationRows.innerHTML = latestRankedStations.length
@@ -224,7 +230,7 @@
       if (highPeakValue) highPeakValue.textContent = highestStation ? `${Number(highestStation.level).toFixed(2)} ม.` : "—";
       if (highPeakNote) highPeakNote.textContent = highestStation ? `${highestStation.code} · เกินเกณฑ์ +${stationExcess(highestStation).toFixed(2)} ม.` : "ไม่พบข้อมูลตามตัวกรอง";
       if (summaryStationTotal) summaryStationTotal.textContent = `${visibleStations.length} จุด`;
-      if (summaryStationBreakdown) summaryStationBreakdown.textContent = `ต้องอพยพ ${stationCounts.red} · อพยพ ${stationCounts.orange} · เฝ้าระวัง ${stationCounts.yellow}`;
+      if (summaryStationBreakdown) summaryStationBreakdown.textContent = `ต้องอพยพ ${stationCounts.red} · อพยพ ${stationCounts.orange} · เตรียมรับมือ ${stationCounts.yellow}`;
       if (summaryTrendValue) summaryTrendValue.textContent = fastestStation ? `${Number(fastestStation.trend) >= 0 ? "+" : ""}${Number(fastestStation.trend).toFixed(2)} ม./ชม.` : "—";
       if (summaryTrendNote) summaryTrendNote.textContent = fastestStation ? `${fastestStation.code} · ${fastestStation.name}` : "ไม่พบข้อมูลตามตัวกรอง";
       const topRiskHeadline = $("#topRiskHeadline");
@@ -232,7 +238,9 @@
         ? `<i class="filter-dot ${highestStationSeverity}"></i>${severityLabels[highestStationSeverity]} ${stationCounts[highestStationSeverity]} จุด <small>· แสดง ${topStations.length} อันดับแรก</small>`
         : `ไม่พบ CCTV ตามตัวกรอง <small>· แสดง 0 อันดับ</small>`;
       const riskSummary = $("#riskSummary");
-      if (riskSummary) riskSummary.innerHTML = ["red","orange","yellow"].map(severity => `<span class="${severity}"><i></i>${severity === "red" ? "แดง" : severity === "orange" ? "ส้ม" : "เหลือง"} <b>${stationCounts[severity]}</b></span>`).join("");
+      if (riskSummary) riskSummary.innerHTML = ["red","orange","yellow"].map(severity => `<span class="${severity}"><i></i>${severityLabels[severity]} <b>${stationCounts[severity]}</b></span>`).join("");
+      const topRiskScope = $("#topRiskScope");
+      if (topRiskScope) topRiskScope.textContent = `${activeProvince === "all" ? "ทุกจังหวัด" : `จังหวัด${activeProvince}`} · ${visibleStations.length} สถานี`;
 
       const sensorAlertCount = $("#sensorAlertCount");
       if (sensorAlertCount) sensorAlertCount.textContent = `${highestByType.length} รายการสูงสุด`;
@@ -243,20 +251,36 @@
         return `<article class="sensor-alert-card ${sensor.type} ${sensor.severity}">${icon}<span class="sensor-alert-copy"><small>${label} · ${sensor.code}</small><b>${sensor.name}</b><em>${sensor.criterion}</em></span><span class="sensor-alert-reading"><b>${sensor.value}</b><small>${sensor.area}</small></span></article>`;
       }).join("") : `<div class="empty-state">ไม่พบ Sensor ที่เข้าเกณฑ์ในจังหวัดและระดับสถานการณ์ที่เลือก</div>`;
 
+      const selectedSensors = visibleSensors.filter(sensor => sensor.type === activeSensorType).sort((a,b) => (severityOrder[b.severity] - severityOrder[a.severity]) || (Number.parseFloat(b.value) - Number.parseFloat(a.value)));
+      const sensorTableHead = $("#sensorTableHead");
+      if (sensorTableHead) sensorTableHead.innerHTML = activeSensorType === "rain"
+        ? `<tr><th>ลำดับ</th><th>ชื่อสถานี / ที่ตั้ง</th><th>หน่วยงาน</th><th>เวลาล่าสุด</th><th>ฝนสะสม 24 ชม.</th></tr>`
+        : `<tr><th>ลำดับ</th><th>ชื่อสถานี / ที่ตั้ง</th><th>หน่วยงาน</th><th>เวลาล่าสุด</th><th>ระดับน้ำ</th><th>ระดับตลิ่ง</th></tr>`;
+      const sensorTableCount = $("#sensorTableCount");
+      if (sensorTableCount) sensorTableCount.textContent = `${selectedSensors.length} สถานี`;
+      if (sensorTableRows) sensorTableRows.innerHTML = selectedSensors.length ? selectedSensors.map((sensor,index) => {
+        const threshold = sensor.criterion.match(/([0-9]+(?:\.[0-9]+)?)\s*(?:ม\.|มม\.)/i)?.[1] || "—";
+        const stationCell = `<td><b>${sensor.code} · ${sensor.name}</b><small>${sensor.area}</small></td>`;
+        const common = `<td>${index + 1}</td>${stationCell}<td>กรมทรัพยากรน้ำ</td><td><time>01/09/2569 ${String(9 + Math.floor(index / 3)).padStart(2,"0")}:${String(index * 7 % 60).padStart(2,"0")} น.</time></td>`;
+        return activeSensorType === "rain"
+          ? `<tr>${common}<td><span class="sensor-reading ${sensor.severity}">${Number.parseFloat(sensor.value).toFixed(0)} มม.</span></td></tr>`
+          : `<tr>${common}<td><span class="sensor-reading ${sensor.severity}">${Number.parseFloat(sensor.value).toFixed(2)} ม.</span></td><td><span class="bank-value">${threshold === "—" ? threshold : Number(threshold).toFixed(2) + " ม."}</span></td></tr>`;
+      }).join("") : `<tr><td colspan="${activeSensorType === "rain" ? 5 : 6}"><div class="empty-state">ไม่พบ Sensor ประเภทนี้ตามตัวกรองที่เลือก</div></td></tr>`;
+
       const stationCount = $("#basinStationCount");
       if (stationCount) stationCount.textContent = `${visibleStations.length} จุด`;
       const stationNote = $("#basinStationNote");
       if (stationNote) stationNote.textContent = visibleStations.length > 4
-        ? `Top 4 จาก ${visibleStations.length} จุดตามตัวกรอง · เรียงระดับความเสี่ยงก่อน แล้วเรียงค่าที่เกิน Threshold จากมากไปน้อย`
-        : `แสดงครบ ${visibleStations.length} จุดตามตัวกรอง · เรียงระดับความเสี่ยงก่อน แล้วเรียงค่าที่เกิน Threshold จากมากไปน้อย`;
+        ? `Top 4 จาก ${visibleStations.length} จุดตามตัวกรอง · เรียงระดับความเสี่ยงและค่าที่เกินเกณฑ์จากมากไปน้อย`
+        : `แสดงครบ ${visibleStations.length} จุดตามตัวกรอง · เรียงระดับความเสี่ยงและค่าที่เกินเกณฑ์จากมากไปน้อย`;
       if (stationRows) stationRows.innerHTML = topStations.length
-        ? topStations.map((station,index) => stationRowMarkup(station,index,true)).join("")
+        ? topStations.map((station,index) => topRiskRowMarkup(station,index)).join("")
         : `<tr><td colspan="7"><div class="empty-state">ไม่พบสถานีตามตัวกรองที่เลือก</div></td></tr>`;
       const basinAllStationCount = $("#basinAllStationCount");
       if (basinAllStationCount) basinAllStationCount.textContent = `${rankedStations.length} สถานี`;
       if (basinAllStationRows) basinAllStationRows.innerHTML = rankedStations.length
         ? rankedStations.map((station,index) => fullStationRowMarkup(station,index)).join("")
-        : `<tr><td colspan="9"><div class="empty-state">ไม่พบสถานีตามตัวกรองที่เลือก</div></td></tr>`;
+        : `<tr><td colspan="8"><div class="empty-state">ไม่พบสถานีตามตัวกรองที่เลือก</div></td></tr>`;
       renderAllStations();
 
       const legend = $("#basinLegendItems");
@@ -410,6 +434,15 @@
     $$("#criteriaFilter [data-criteria]").forEach(button => button.addEventListener("click", () => {
       activeCriteria = button.dataset.criteria;
       $$("#criteriaFilter [data-criteria]").forEach(item => item.classList.toggle("active", item === button));
+      render();
+    }));
+    $$("#sensorTableTabs [data-sensor-table]").forEach(button => button.addEventListener("click", () => {
+      activeSensorType = button.dataset.sensorTable;
+      $$("#sensorTableTabs [data-sensor-table]").forEach(item => {
+        const active = item === button;
+        item.classList.toggle("active", active);
+        item.setAttribute("aria-selected", String(active));
+      });
       render();
     }));
     const legendPanel = $("#basinLegend");
@@ -813,7 +846,7 @@
         if (!(drilldown.cctv || []).length) drilldown.stations.map((station,index) => [...drilldown.route[routeIndexes[index]],station]).forEach(([longitude,latitude,station]) => stationLayer.add(new Graphic({
           geometry:{type:"point",longitude,latitude},
           symbol:{type:"simple-marker",color:station.severity === "red" ? "#e34b4b" : station.severity === "orange" ? "#f28a2e" : "#f4c430",size:13,outline:{color:"#fff",width:2}},
-          attributes:{code:station.code,category:"station",severity:station.severity,province:station.province},popupTemplate:{title:`${station.code} · ${station.name}`,content:`ต.${station.subdistrict} อ.${station.district} จ.${station.province}<br><b>ระดับน้ำ ${station.level} เมตร</b><br>สถานะ ${station.severity === "red" ? "ต้องอพยพ" : station.severity === "orange" ? "อพยพ" : "เฝ้าระวัง"}`}
+          attributes:{code:station.code,category:"station",severity:station.severity,province:station.province},popupTemplate:{title:`${station.code} · ${station.name}`,content:`ต.${station.subdistrict} อ.${station.district} จ.${station.province}<br><b>ระดับน้ำ ${station.level} เมตร</b><br>สถานะ ${station.severity === "red" ? "ต้องอพยพ" : station.severity === "orange" ? "อพยพ" : "เตรียมรับมือ"}`}
         })));
         (drilldown.sensors || []).forEach(sensor => stationLayer.add(new Graphic({
           geometry:{type:"point",longitude:sensor.coordinate[0],latitude:sensor.coordinate[1]},
@@ -823,7 +856,7 @@
         (drilldown.cctv || []).forEach(camera => stationLayer.add(new Graphic({
           geometry:{type:"point",longitude:camera.coordinate[0],latitude:camera.coordinate[1]},
           symbol:{type:"picture-marker",url:cctvMarkerUrl(camera.severity),width:28,height:28,xoffset:0,yoffset:10},
-          attributes:{code:camera.code,category:"cctv",severity:camera.severity,province:camera.province},popupTemplate:{title:`${camera.code} · ${camera.name}`,content:`ต.${camera.subdistrict} อ.${camera.district} จ.${camera.province}<br><b>ระดับน้ำ ${camera.level} เมตร</b> · ระดับตลิ่ง ${camera.bank} เมตร<br><b>ระดับสถานการณ์ ${camera.severity === "red" ? "ต้องอพยพ" : camera.severity === "orange" ? "อพยพ" : "เฝ้าระวัง"}</b>`}
+          attributes:{code:camera.code,category:"cctv",severity:camera.severity,province:camera.province},popupTemplate:{title:`${camera.code} · ${camera.name}`,content:`ต.${camera.subdistrict} อ.${camera.district} จ.${camera.province}<br><b>ระดับน้ำ ${camera.level} เมตร</b> · ระดับตลิ่ง ${camera.bank} เมตร<br><b>ระดับสถานการณ์ ${camera.severity === "red" ? "ต้องอพยพ" : camera.severity === "orange" ? "อพยพ" : "เตรียมรับมือ"}</b>`}
         })));
       }
 
