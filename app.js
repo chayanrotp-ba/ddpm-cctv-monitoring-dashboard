@@ -10,8 +10,8 @@
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version 1.1.10";
-    badge.title = "Patch version: v1.1.10 · baseline: v1.0-baseline";
+    badge.textContent = "Version 1.2.0";
+    badge.title = "Minor version: v1.2.0 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -536,49 +536,119 @@
   }
 
   function initMonitor() {
-    const tabButtons = $$("[data-monitor-tab]");
-    const panels = $$("[data-monitor-panel]");
-    tabButtons.forEach(button => button.addEventListener("click", () => {
-      const selected = button.dataset.monitorTab;
-      tabButtons.forEach(item => item.classList.toggle("active", item === button));
-      panels.forEach(panel => panel.classList.toggle("active", panel.dataset.monitorPanel === selected));
-    }));
-
+    const stations = window.MONITOR_STATIONS || [];
+    const metadata = window.MONITOR_META || {source:"Daily Report CCTV"};
+    const regionOrder = ["ภาคเหนือ","ภาคกลาง","ภาคตะวันออกเฉียงเหนือ","ภาคตะวันออก","ภาคใต้"];
+    const regionColors = {"ภาคเหนือ":"#5669f5","ภาคกลาง":"#29c99a","ภาคตะวันออกเฉียงเหนือ":"#f4bd2a","ภาคตะวันออก":"#ed8b2f","ภาคใต้":"#54a8e7"};
+    let activeMode = "all";
+    let activeRegion = "all";
+    let activeProvince = "all";
+    let visibleStations = [];
     const search = $("#monitorSearch");
     const status = $("#deviceStatus");
-    const rows = $$("#deviceTable tr");
+    const regionSelect = $("#monitorRegion");
+    const provinceSelect = $("#monitorProvince");
+    const tableBody = $("#deviceTable");
+    const escapeHtml = value => String(value ?? "").replace(/[&<>\"]/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[character]);
+    const countBy = (items, key) => items.reduce((counts,item) => ((counts[item[key]] = (counts[item[key]] || 0) + 1),counts),{});
+    const baseStations = () => activeMode === "abnormal" ? stations.filter(item => item.status !== "online") : stations;
+
+    const refreshProvinceOptions = () => {
+      const provinces = [...new Set(stations.filter(item => activeRegion === "all" || item.region === activeRegion).map(item => item.province))].sort((a,b) => a.localeCompare(b,"th"));
+      provinceSelect.innerHTML = `<option value="all">ทุกจังหวัด</option>${provinces.map(province => `<option value="${escapeHtml(province)}">${escapeHtml(province)}</option>`).join("")}`;
+      if (!provinces.includes(activeProvince)) activeProvince = "all";
+      provinceSelect.value = activeProvince;
+    };
+
+    const renderOverview = () => {
+      const scope = baseStations();
+      const regionCounts = countBy(scope,"region");
+      const total = scope.length || 1;
+      let cumulative = 0;
+      const segments = regionOrder.map(region => {
+        const start = cumulative;
+        cumulative += (regionCounts[region] || 0) / total * 100;
+        return `${regionColors[region]} ${start.toFixed(2)}% ${cumulative.toFixed(2)}%`;
+      });
+      const donut = $("#monitorRegionDonut");
+      if (donut) {
+        donut.style.background = `conic-gradient(${segments.join(",")})`;
+        donut.innerHTML = `<div><b>${scope.length}</b><span>${activeMode === "abnormal" ? "สถานีผิดปกติ" : "สถานีทั้งหมด"}</span></div>`;
+      }
+      const regionList = $("#monitorRegionList");
+      if (regionList) regionList.innerHTML = regionOrder.map(region => `<button type="button" data-region-summary="${region}" class="${activeRegion === region ? "active" : ""}"><i style="background:${regionColors[region]}"></i><span>${region}</span><b>${regionCounts[region] || 0}</b><small>สถานี</small></button>`).join("");
+      const provinceScope = scope.filter(item => activeRegion === "all" || item.region === activeRegion);
+      const provinceCounts = Object.entries(countBy(provinceScope,"province")).sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0],"th"));
+      const maxProvince = Math.max(1,...provinceCounts.map(([,count]) => count));
+      $("#monitorProvinceTitle").textContent = activeRegion === "all" ? "จังหวัดทั้งหมด" : `จังหวัดใน${activeRegion}`;
+      $("#monitorProvinceHint").textContent = `${provinceCounts.length} จังหวัด`;
+      const bars = $("#monitorProvinceBars");
+      if (bars) bars.innerHTML = provinceCounts.map(([province,count]) => `<button type="button" data-province-summary="${escapeHtml(province)}" class="${activeProvince === province ? "active" : ""}"><span>${escapeHtml(province)}</span><i><em style="width:${(count / maxProvince * 100).toFixed(1)}%"></em></i><b>${count}</b><small>สถานี</small></button>`).join("");
+    };
+
     const applyTableFilter = () => {
       const query = (search?.value || "").trim().toLowerCase();
       const statusValue = status?.value || "all";
-      let visible = 0;
-      rows.forEach(row => {
-        const statusMatch = statusValue === "all" || row.dataset.deviceStatus === statusValue;
-        const searchMatch = !query || (row.dataset.search || "").toLowerCase().includes(query);
-        row.hidden = !(statusMatch && searchMatch);
-        if (!row.hidden) visible += 1;
+      visibleStations = baseStations().filter(item => {
+        const haystack = `${item.code} ${item.name} ${item.subdistrict} ${item.district} ${item.province} ${item.region}`.toLowerCase();
+        return (statusValue === "all" || item.status === statusValue) && (activeRegion === "all" || item.region === activeRegion) && (activeProvince === "all" || item.province === activeProvince) && (!query || haystack.includes(query));
       });
-      const result = $("#deviceResult");
-      if (result) result.textContent = `แสดง ${visible} จาก 180 สถานี`;
+      if (tableBody) tableBody.innerHTML = visibleStations.length ? visibleStations.map(item => `<tr data-device-status="${item.status}"><td><b>${escapeHtml(item.code)}</b></td><td class="station-name-cell">${escapeHtml(item.name)}</td><td>${escapeHtml(item.district)}</td><td>${escapeHtml(item.subdistrict)}</td><td>${escapeHtml(item.province)}</td><td>${escapeHtml(item.region)}</td><td><span class="camera-state ${item.camera1 ? "online" : "offline"}"><i></i>${item.camera1 ? "ออนไลน์" : "ผิดปกติ"}</span></td><td><span class="camera-state ${item.camera2 ? "online" : "offline"}"><i></i>${item.camera2 ? "ออนไลน์" : "ผิดปกติ"}</span></td><td>${item.waterAvailable ? `<b class="water-available">${escapeHtml(item.waterValue)}</b>` : `<span class="water-missing">ไม่มีข้อมูล</span>`}</td><td><time>${escapeHtml(item.time)}</time></td></tr>`).join("") : `<tr><td colspan="10"><div class="empty-state">ไม่พบสถานีตามตัวกรองที่เลือก</div></td></tr>`;
+      $("#deviceResult").textContent = `แสดง ${visibleStations.length} จาก ${baseStations().length} สถานี`;
+      $("#monitorConnectionText").textContent = `กำลังเชื่อมต่อสถานี ${visibleStations.length} จุด`;
     };
+
+    const render = () => { renderOverview(); applyTableFilter(); };
+    const regions = regionOrder.filter(region => stations.some(item => item.region === region));
+    regionSelect.innerHTML = `<option value="all">ทุกภาค</option>${regions.map(region => `<option value="${region}">${region}</option>`).join("")}`;
+    refreshProvinceOptions();
+    const online = stations.filter(item => item.status === "online").length;
+    const delay = stations.filter(item => item.status === "delay").length;
+    const offline = stations.filter(item => item.status === "offline").length;
+    $("#allStationTabCount").textContent = stations.length;
+    $("#abnormalStationTabCount").textContent = stations.length - online;
+    $("#monitorMapSummary").textContent = `ออนไลน์ ${online} · ล่าช้า ${delay} · ออฟไลน์ ${offline} จุด`;
+    $("#monitorDataSource").textContent = `ที่มา: ${metadata.source}`;
+
+    $$("[data-monitor-mode]").forEach(button => button.addEventListener("click", () => {
+      activeMode = button.dataset.monitorMode;
+      $$("[data-monitor-mode]").forEach(item => item.classList.toggle("active",item === button));
+      render();
+    }));
     search?.addEventListener("input", applyTableFilter);
     status?.addEventListener("change", applyTableFilter);
+    regionSelect?.addEventListener("change", () => { activeRegion = regionSelect.value; activeProvince = "all"; refreshProvinceOptions(); render(); });
+    provinceSelect?.addEventListener("change", () => { activeProvince = provinceSelect.value; render(); });
+    $("#monitorRegionList")?.addEventListener("click", event => {
+      const button = event.target.closest("[data-region-summary]");
+      if (!button) return;
+      activeRegion = activeRegion === button.dataset.regionSummary ? "all" : button.dataset.regionSummary;
+      activeProvince = "all";
+      regionSelect.value = activeRegion;
+      refreshProvinceOptions();
+      render();
+    });
+    $("#monitorProvinceBars")?.addEventListener("click", event => {
+      const button = event.target.closest("[data-province-summary]");
+      if (!button) return;
+      activeProvince = activeProvince === button.dataset.provinceSummary ? "all" : button.dataset.provinceSummary;
+      provinceSelect.value = activeProvince;
+      render();
+    });
     $("#monitorRefresh")?.addEventListener("click", event => flashRefresh(event.currentTarget));
-
     $("#exportCsv")?.addEventListener("click", () => {
       const lines = [
-        ["สถานะ", "รหัสสถานี", "ชื่อสถานี", "ลุ่มน้ำ/จังหวัด", "ข้อมูลล่าสุด", "อัปเดตล่าสุด"],
-        ...rows.filter(row => !row.hidden).map(row => {
-          const cells = $$(`td`, row).slice(1, 7).map(cell => cell.innerText.replace(/\s+/g, " ").trim());
-          return [row.dataset.deviceStatus === "online" ? "ออนไลน์" : row.dataset.deviceStatus === "delay" ? "ข้อมูลล่าช้า" : "ออฟไลน์", ...cells.slice(0, 3), cells[4], cells[5]];
-        })
+        ["รหัสสถานี","ชื่อสถานี","อำเภอ","ตำบล","จังหวัด","ภาค","สถานะกล้อง 1","สถานะกล้อง 2","ระดับน้ำ","ข้อมูลล่าสุด"],
+        ...visibleStations.map(item => [item.code,item.name,item.district,item.subdistrict,item.province,item.region,item.camera1 ? "ออนไลน์" : "ผิดปกติ",item.camera2 ? "ออนไลน์" : "ผิดปกติ",item.waterValue,item.time])
       ];
       const csv = "\ufeff" + lines.map(line => line.map(value => `"${String(value).replace(/"/g, '""')}"`).join(",")).join("\r\n");
       const link = document.createElement("a");
       link.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-      link.download = "ddpm-cctv-device-status-mockup.csv";
+      link.download = "ddpm-cctv-station-monitor-02092569.csv";
       link.click();
       URL.revokeObjectURL(link.href);
     });
+    render();
   }
 
   const basinFeatures = window.ONWR_BASINS?.features || [];
