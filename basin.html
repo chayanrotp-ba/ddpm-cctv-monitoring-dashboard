@@ -42,11 +42,11 @@
         <button id="homeBtn" type="button" title="แสดงลุ่มน้ำทั้งหมด">⌂</button>
         <button id="zoomIn" type="button" title="ขยายแผนที่">＋</button>
         <button id="zoomOut" type="button" title="ย่อแผนที่">−</button>
-        <button class="sensor-layer-control-toggle" id="sensorLayerControlToggle" type="button" title="เปิดหรือปิดตัวเลือกข้อมูล Sensor" aria-label="เปิดหรือปิดตัวเลือกข้อมูล Sensor" aria-expanded="true" aria-controls="sensorLayerPanel">
+        <button class="sensor-layer-control-toggle" id="sensorLayerControlToggle" type="button" title="เปิดหรือปิดตัวเลือกข้อมูล Sensor" aria-label="เปิดหรือปิดตัวเลือกข้อมูล Sensor" aria-expanded="false" aria-controls="sensorLayerPanel">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h2m2-4v8m3-11v14m3-11v8m3-4h3"/></svg>
         </button>
       </div>
-      <div class="sensor-layer-panel surface" id="sensorLayerPanel" aria-label="ควบคุม Layer ข้อมูล Sensor">
+      <div class="sensor-layer-panel surface" id="sensorLayerPanel" aria-label="ควบคุม Layer ข้อมูล Sensor" hidden>
         <header><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h2m2-4v8m3-11v14m3-11v8m3-4h3"/></svg><b>ข้อมูล Sensor</b></header>
         <button class="sensor-layer-option is-on" type="button" role="switch" aria-checked="true" data-sensor-layer-toggle="flow">
           <i class="sensor-map-symbol flow blue" aria-hidden="true"></i><span>สถานีวัดระดับน้ำท่า</span><em aria-hidden="true"></em>
