@@ -10,8 +10,8 @@
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version 1.1.5";
-    badge.title = "Patch version: v1.1.5 · baseline: v1.0-baseline";
+    badge.textContent = "Version 1.1.6";
+    badge.title = "Patch version: v1.1.6 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -38,6 +38,37 @@
         button.disabled = false;
       }, 850);
     }, 650);
+  }
+
+  function initBasinSensorLayerControl() {
+    if (page !== "basin") return;
+    const panel = $("#sensorLayerPanel");
+    const panelToggle = $("#sensorLayerControlToggle");
+    const options = $$('[data-sensor-layer-toggle]');
+    if (!panel || !panelToggle || !options.length) return;
+    const state = window.basinSensorLayerState || {flow:true,rain:true};
+    window.basinSensorLayerState = state;
+
+    const applyLayerState = (type, visible, notify = true) => {
+      state[type] = visible;
+      document.body.classList.toggle(`sensor-${type}-layer-hidden`, !visible);
+      const option = $(`[data-sensor-layer-toggle="${type}"]`);
+      option?.classList.toggle("is-on", visible);
+      option?.setAttribute("aria-checked", String(visible));
+      if (notify) document.dispatchEvent(new CustomEvent("basin-sensor-layer-change", {detail:{type,visible}}));
+    };
+
+    options.forEach(option => option.addEventListener("click", () => {
+      const type = option.dataset.sensorLayerToggle;
+      applyLayerState(type, !state[type]);
+    }));
+    panelToggle.addEventListener("click", () => {
+      const expanded = panelToggle.getAttribute("aria-expanded") === "true";
+      panelToggle.setAttribute("aria-expanded", String(!expanded));
+      panel.hidden = expanded;
+    });
+    applyLayerState("flow", state.flow !== false, false);
+    applyLayerState("rain", state.rain !== false, false);
   }
 
   function initOverview() {
@@ -844,11 +875,11 @@
     if (page === "basin") (activeDrilldown.sensors || []).forEach(sensor => {
       const [cx,cy] = projectCoordinate(sensor.coordinate);
       if (sensor.type === "rain") {
-        appendSvgElement(svg,"image",{x:(cx - 10).toFixed(1),y:(cy - 13).toFixed(1),width:20,height:25,href:RAIN_SENSOR_ICON,class:"real-sensor-rain-image","data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
+        appendSvgElement(svg,"image",{x:(cx - 10).toFixed(1),y:(cy - 13).toFixed(1),width:20,height:25,href:RAIN_SENSOR_ICON,class:"real-sensor-rain-image","data-sensor-layer":"rain","data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
       } else {
-        appendSvgElement(svg,"path",{d:`M ${cx} ${cy - 10} L ${cx - 10} ${cy + 8} L ${cx + 10} ${cy + 8} Z`,class:`real-sensor flow ${sensor.severity}`,"data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
+        appendSvgElement(svg,"path",{d:`M ${cx} ${cy - 10} L ${cx - 10} ${cy + 8} L ${cx + 10} ${cy + 8} Z`,class:`real-sensor flow ${sensor.severity}`,"data-sensor-layer":"flow","data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
       }
-      const label = appendSvgElement(svg,"text",{x:(cx + 10).toFixed(1),y:(cy + 3).toFixed(1),class:"real-sensor-label","data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
+      const label = appendSvgElement(svg,"text",{x:(cx + 10).toFixed(1),y:(cy + 3).toFixed(1),class:"real-sensor-label","data-sensor-layer":sensor.type,"data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
       label.textContent = sensor.type === "rain" ? "ฝน" : "น้ำท่า";
     });
     if (page === "basin") (activeDrilldown.cctv || []).forEach(camera => {
@@ -888,6 +919,9 @@
       const routeLayer = new GraphicsLayer({ title: "เส้นทางมวลน้ำ" });
       const provinceBoundaryLayer = new GraphicsLayer({ title: "ขอบเขตจังหวัดภายในลุ่มน้ำ" });
       const stationLayer = new GraphicsLayer({ title: "สถานีตรวจวัด" });
+      const sensorLayerState = window.basinSensorLayerState || {flow:true,rain:true};
+      const flowSensorLayer = new GraphicsLayer({ title:"สถานีวัดระดับน้ำท่า", visible:sensorLayerState.flow !== false });
+      const rainSensorLayer = new GraphicsLayer({ title:"สถานีวัดระดับน้ำฝน", visible:sensorLayerState.rain !== false });
       const basinLabelLayer = new GraphicsLayer({ title: "ชื่อลุ่มน้ำแจ้งเตือน", listMode:"hide" });
       basinLayer.addMany(basinFeatures.map(feature => createPolygonGraphic(Graphic, feature)));
       if (page === "overview") basinLabelLayer.addMany(
@@ -902,11 +936,14 @@
           symbol:{type:"simple-marker",color:station.severity === "red" ? "#e34b4b" : station.severity === "orange" ? "#f28a2e" : "#f4c430",size:13,outline:{color:"#fff",width:2}},
           attributes:{code:station.code,category:"station",severity:station.severity,province:station.province},popupTemplate:{title:`${station.code} · ${station.name}`,content:`ต.${station.subdistrict} อ.${station.district} จ.${station.province}<br><b>ระดับน้ำ ${station.level} เมตร</b><br>สถานะ ${waterSeverityLabel(station.severity)}`}
         })));
-        (drilldown.sensors || []).forEach(sensor => stationLayer.add(new Graphic({
-          geometry:{type:"point",longitude:sensor.coordinate[0],latitude:sensor.coordinate[1]},
-          symbol:{type:"picture-marker",url:sensorMarkerDataUri(sensor.type,sensor.severity),width:21,height:21,xoffset:0,yoffset:8},
-          attributes:{sensorCode:sensor.code,category:"sensor",severity:sensor.severity,province:sensor.province || sensor.area.replace("จังหวัด", "")},popupTemplate:{title:sensor.type === "rain" ? "Sensor ปริมาณฝน" : "Sensor น้ำท่า",content:`${sensor.name}<br><b>${sensor.value}</b><br>${sensor.criterion}`}
-        })));
+        (drilldown.sensors || []).forEach(sensor => {
+          const targetLayer = sensor.type === "rain" ? rainSensorLayer : flowSensorLayer;
+          targetLayer.add(new Graphic({
+            geometry:{type:"point",longitude:sensor.coordinate[0],latitude:sensor.coordinate[1]},
+            symbol:{type:"picture-marker",url:sensorMarkerDataUri(sensor.type,sensor.severity),width:21,height:21,xoffset:0,yoffset:8},
+            attributes:{sensorCode:sensor.code,category:"sensor",sensorType:sensor.type,severity:sensor.severity,province:sensor.province || sensor.area.replace("จังหวัด", "")},popupTemplate:{title:sensor.type === "rain" ? "Sensor ปริมาณฝน" : "Sensor น้ำท่า",content:`${sensor.name}<br><b>${sensor.value}</b><br>${sensor.criterion}`}
+          }));
+        });
         (drilldown.cctv || []).forEach(camera => stationLayer.add(new Graphic({
           geometry:{type:"point",longitude:camera.coordinate[0],latitude:camera.coordinate[1]},
           symbol:{type:"picture-marker",url:cctvMarkerUrl(camera.severity),width:28,height:28,xoffset:0,yoffset:10},
@@ -966,8 +1003,8 @@
         }
       }) : null;
       const operationalLayers = streamLayer
-        ? [basinLayer,streamLayer,provinceBoundaryLayer,routeLayer,stationLayer,basinLabelLayer]
-        : [basinLayer,provinceBoundaryLayer,routeLayer,stationLayer,basinLabelLayer];
+        ? [basinLayer,streamLayer,provinceBoundaryLayer,routeLayer,flowSensorLayer,rainSensorLayer,stationLayer,basinLabelLayer]
+        : [basinLayer,provinceBoundaryLayer,routeLayer,flowSensorLayer,rainSensorLayer,stationLayer,basinLabelLayer];
       const map = new Map({ basemap:"topo-vector", layers:operationalLayers });
       const view = new MapView({
         container:"viewDiv",
@@ -1002,12 +1039,17 @@
       if (page === "basin") {
         const normalizeCode = code => String(code || "").replace(/-/g, "").toUpperCase();
         window.filterBasinMap = (criteria = "all", province = "all") => {
-          stationLayer.graphics.forEach(graphic => {
-            const criteriaMatch = criteria === "all" || graphic.attributes?.severity === criteria;
-            const provinceMatch = province === "all" || graphic.attributes?.province === province;
-            graphic.visible = criteriaMatch && provinceMatch;
-          });
+          [stationLayer,flowSensorLayer,rainSensorLayer].forEach(layer => layer.graphics.forEach(graphic => {
+              const criteriaMatch = criteria === "all" || graphic.attributes?.severity === criteria;
+              const provinceMatch = province === "all" || graphic.attributes?.province === province;
+              graphic.visible = criteriaMatch && provinceMatch;
+            })
+          );
         };
+        document.addEventListener("basin-sensor-layer-change", event => {
+          const layer = event.detail?.type === "rain" ? rainSensorLayer : flowSensorLayer;
+          if (event.detail?.type === "rain" || event.detail?.type === "flow") layer.visible = event.detail.visible;
+          });
         window.focusBasinStation = code => {
           const matches = [...stationLayer.graphics].filter(graphic => normalizeCode(graphic.attributes?.code) === normalizeCode(code));
           const graphic = matches.find(item => item.attributes?.category === "cctv") || matches[0];
@@ -1043,6 +1085,7 @@
 
   updateClock();
   initVersionBadge();
+  initBasinSensorLayerControl();
   window.setInterval(updateClock, 1000);
   renderFallbackBasins();
   if (page === "overview") initOverview();

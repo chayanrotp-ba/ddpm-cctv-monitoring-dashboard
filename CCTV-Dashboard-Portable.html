@@ -65,6 +65,9 @@ button,a{outline-offset:3px}
 .map-title-card b,.map-title-card small{display:block}.map-title-card b{font-size:13px}.map-title-card small{font-size:9px;color:var(--muted)}
 .map-tools{position:absolute;z-index:5;right:18px;top:18px;padding:4px;border-radius:11px;display:grid}
 .map-tools button{width:36px;height:35px;border:0;border-bottom:1px solid var(--line);background:transparent;color:#606576;font-size:18px;cursor:pointer}.map-tools button:last-child{border:0}.map-tools button:hover{background:var(--primary-soft);color:var(--primary)}
+.map-tools button svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle}.map-tools .sensor-layer-control-toggle[aria-expanded="true"]{background:var(--primary-soft);color:var(--primary)}
+.sensor-layer-panel{position:absolute;z-index:6;right:62px;top:127px;width:250px;padding:8px 12px;border-radius:7px;background:rgba(255,255,255,.98)}.sensor-layer-panel[hidden]{display:none}.sensor-layer-panel header{display:flex;align-items:center;gap:8px;padding:2px 0 8px;border-bottom:1px solid var(--line);color:#3c4352}.sensor-layer-panel header svg{width:18px;height:18px;fill:none;stroke:var(--primary);stroke-width:1.6;stroke-linecap:round}.sensor-layer-panel header b{font-size:11px}.sensor-layer-option{width:100%;min-height:40px;display:grid;grid-template-columns:21px 1fr 34px;align-items:center;gap:8px;border:0;border-bottom:1px solid #eef0f4;background:transparent;padding:5px 0;color:#303643;text-align:left;font:inherit;cursor:pointer}.sensor-layer-option:last-child{border-bottom:0}.sensor-layer-option:hover{color:var(--primary)}.sensor-layer-option span{font-size:10px;font-weight:600}.sensor-layer-option img{width:15px;height:19px;object-fit:contain;justify-self:center}.sensor-layer-option .sensor-map-symbol{width:16px;height:16px;justify-self:center}.sensor-layer-option em{position:relative;width:32px;height:19px;border-radius:999px;background:#cdd2dc;transition:background .18s ease}.sensor-layer-option em:before{content:"";position:absolute;left:2px;top:2px;width:15px;height:15px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(33,39,54,.25);transition:transform .18s ease}.sensor-layer-option.is-on em{background:#5668eb}.sensor-layer-option.is-on em:before{transform:translateX(13px)}
+body.sensor-flow-layer-hidden [data-sensor-layer="flow"],body.sensor-rain-layer-hidden [data-sensor-layer="rain"]{display:none!important}
 .map-legend{position:absolute;z-index:5;left:20px;bottom:18px;border-radius:12px;padding:11px 13px;display:grid;gap:5px;min-width:170px}.map-legend>b{font-size:10px;margin-bottom:2px}.map-legend span{font-size:9px;color:#5d6272;display:flex;align-items:center;gap:7px}.dot{width:9px;height:9px;border-radius:50%;display:inline-block}.dot.red{background:var(--red)}.dot.orange{background:var(--orange)}.dot.yellow{background:var(--yellow)}.dot.gray{background:#c4c8d0}.dot.green{background:var(--green)}.dot.gray-dark{background:#8d929f}
 .mock-label{position:absolute;z-index:5;right:18px;bottom:80px;border-radius:9px;padding:7px 10px;font-size:8px;color:#7d8290;letter-spacing:.2px}
 
@@ -89,7 +92,7 @@ button,a{outline-offset:3px}
 
 /* Basin detail */
 .detail-basin-area{fill:rgba(83,174,210,.11);stroke:#52a9cd;stroke-width:3;stroke-dasharray:8 5}.water-route,.water-branch{fill:none;stroke:#278fc3;stroke-width:8;stroke-linecap:round}.water-branch{stroke-width:4;opacity:.65}.route-stations text{font-family:"Noto Sans Thai",sans-serif;font-size:13px;font-weight:700;fill:#3c4252;paint-order:stroke;stroke:#fff;stroke-width:4px}.station{stroke:#fff;stroke-width:5}.station.red{fill:var(--red)}.station.orange{fill:var(--orange)}.station.yellow{fill:var(--yellow)}
-.back-link{width:30px;height:30px;border-radius:8px;background:var(--primary-soft);display:grid;place-items:center;text-decoration:none;color:var(--primary);font-size:24px}.route-legend{min-width:205px;max-width:235px;transition:.18s ease}.legend-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;background:transparent;padding:0;color:#303542;cursor:pointer}.legend-toggle b{font-size:10px}.legend-toggle>span{width:20px;height:20px;border-radius:5px;background:#f0f2f6;color:#394052!important;display:grid!important;place-items:center;font-size:15px!important;line-height:1}.route-legend #basinLegendItems{display:grid;gap:5px;margin-top:6px}.route-legend.collapsed{min-width:176px}.route-legend.collapsed #basinLegendItems{display:none}.route-legend span{display:flex;align-items:center;gap:6px;line-height:1.25}.station-symbol{width:10px;height:10px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px currentColor}.station-symbol.red{background:var(--red);color:var(--red)}.station-symbol.orange{background:var(--orange);color:var(--orange)}.station-symbol.yellow{background:var(--yellow);color:var(--yellow)}.sensor-map-symbol{width:13px;height:13px;display:inline-block;vertical-align:-2px;background:currentColor;border:1px solid #5d6672;flex:0 0 auto}.sensor-map-symbol.flow{clip-path:polygon(50% 0,100% 100%,0 100%)}.sensor-map-symbol.red{color:#ff0000}.sensor-map-symbol.orange{color:#E86011}.sensor-map-symbol.yellow{color:#F4D439}.sensor-rain-legend-icon{width:14px;height:18px;object-fit:contain;flex:0 0 auto}
+.back-link{width:30px;height:30px;border-radius:8px;background:var(--primary-soft);display:grid;place-items:center;text-decoration:none;color:var(--primary);font-size:24px}.route-legend{min-width:205px;max-width:235px;transition:.18s ease}.legend-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;background:transparent;padding:0;color:#303542;cursor:pointer}.legend-toggle b{font-size:10px}.legend-toggle>span{width:20px;height:20px;border-radius:5px;background:#f0f2f6;color:#394052!important;display:grid!important;place-items:center;font-size:15px!important;line-height:1}.route-legend #basinLegendItems{display:grid;gap:5px;margin-top:6px}.route-legend.collapsed{min-width:176px}.route-legend.collapsed #basinLegendItems{display:none}.route-legend span{display:flex;align-items:center;gap:6px;line-height:1.25}.station-symbol{width:10px;height:10px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px currentColor}.station-symbol.red{background:var(--red);color:var(--red)}.station-symbol.orange{background:var(--orange);color:var(--orange)}.station-symbol.yellow{background:var(--yellow);color:var(--yellow)}.sensor-map-symbol{width:13px;height:13px;display:inline-block;vertical-align:-2px;background:currentColor;border:1px solid #5d6672;flex:0 0 auto}.sensor-map-symbol.flow{clip-path:polygon(50% 0,100% 100%,0 100%)}.sensor-map-symbol.red{color:#ff0000}.sensor-map-symbol.orange{color:#E86011}.sensor-map-symbol.yellow{color:#F4D439}.sensor-map-symbol.blue{color:#56a9e8}.sensor-rain-legend-icon{width:14px;height:18px;object-fit:contain;flex:0 0 auto}
 .basin-content{padding-top:15px}.basin-header{border-bottom:1px solid var(--line);padding:0 4px 12px}.breadcrumb{display:flex;gap:7px;align-items:center;font-size:8px;color:var(--muted);margin-bottom:6px}.breadcrumb a{color:var(--primary);text-decoration:none}.basin-title-row{display:flex;justify-content:space-between;align-items:center;gap:12px}.basin-title-row p{font-size:8px;color:var(--muted);margin:0}.basin-title-row h1{font-size:22px;margin:0}.province-line{font-size:8px;color:var(--muted)}.status-badge{display:inline-flex;align-items:center;justify-content:center;border-radius:15px;padding:4px 8px;font-size:7px;white-space:nowrap}.status-badge.red{background:var(--red-soft);color:#c33232}.status-badge.orange{background:var(--orange-soft);color:#c56213}.status-badge.yellow{background:var(--yellow-soft);color:#987500}.status-badge.normal{background:var(--green-soft);color:#108258}.basin-status-set{display:flex;justify-content:flex-end;gap:5px;flex-wrap:wrap;max-width:260px}.basin-status-set .status-badge{font-size:8px;padding:5px 10px}.province-chips{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}.province-chips button{border:1px solid var(--line);background:#fff;color:#6d7180;border-radius:15px;padding:4px 9px;font-size:7px;cursor:pointer}.province-chips button.active{color:#fff;background:var(--primary);border-color:var(--primary)}.criteria-filter{display:flex;align-items:center;gap:5px;margin-top:8px;flex-wrap:wrap}.criteria-filter>span{font-size:7px;color:var(--muted);margin-right:3px}.criteria-filter button{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:#fff;color:#656b7a;border-radius:6px;padding:5px 8px;font-size:7px;cursor:pointer}.criteria-filter button.active{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary);color:#252d70;background:#f6f7ff;font-weight:700}.filter-dot{width:7px;height:7px;border-radius:50%}.filter-dot.red{background:#ff0000}.filter-dot.orange{background:#E86011}.filter-dot.yellow{background:#F4D439}
 .detail-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:11px 0}.detail-summary-grid article{border:1px solid var(--line);border-radius:9px;padding:9px 10px}.detail-summary-grid span,.detail-summary-grid small{display:block;font-size:7px;color:var(--muted)}.detail-summary-grid b{font-size:14px}
 .travel-card,.station-section{border:1px solid var(--line);border-radius:11px;padding:11px;margin-top:9px;background:#fff}.data-note{background:#f5f6f9;padding:4px 8px;border-radius:12px}.travel-overview{height:30px;border-radius:7px;background:linear-gradient(90deg,var(--red-soft),#fff5e8,var(--yellow-soft));display:flex;align-items:center;justify-content:space-between;padding:0 10px;margin-bottom:9px}.travel-overview span{font-size:7px;color:var(--muted)}.travel-overview b{font-size:9px}.travel-timeline{list-style:none;padding:0;margin:0}.travel-timeline li{display:grid;grid-template-columns:55px 1fr 70px;align-items:center;gap:10px;position:relative;padding:7px 0}.travel-timeline li+li:before{content:"";position:absolute;width:2px;height:17px;background:#d9dce5;left:27px;top:-9px}.time-node{height:28px;border-radius:15px;border:1px solid var(--line);display:grid;place-items:center;font-size:7px;background:#fff}.travel-timeline li.red .time-node{background:var(--red);border-color:var(--red);color:#fff}.travel-timeline li.orange .time-node{border-color:var(--orange);color:#b85c12}.travel-timeline li.yellow .time-node{border-color:var(--yellow);color:#8e7000}.travel-timeline small,.travel-timeline b,.travel-timeline em{display:block}.travel-timeline small,.travel-timeline em{font-size:7px;color:var(--muted);font-style:normal}.travel-timeline b{font-size:9px}.travel-timeline>li>strong{font-size:7px;text-align:right}.travel-timeline li.red>strong{color:var(--red)}.travel-timeline li.orange>strong{color:var(--orange)}.travel-timeline li.yellow>strong{color:#9a7900}
@@ -125,7 +128,7 @@ button,a{outline-offset:3px}
 @media (min-width:1500px){.system-shell{grid-template-columns:44% 56%}.content-pane{padding-left:22px;padding-right:22px}.basin-main{grid-template-columns:5px 32px minmax(230px,1fr) 100px 58px 20px}.data-table{font-size:8px}.data-table th{font-size:8px}}
 @media (max-width:1050px){.system-shell{grid-template-columns:40% 60%}.map-pane{border-right-width:8px}.basin-main{grid-template-columns:5px 24px minmax(140px,1fr) 70px 43px 12px;gap:6px}.basin-meta{padding-left:44px}.detail-summary-grid{grid-template-columns:1fr 1fr}.station-row{grid-template-columns:45px 1fr 60px 64px 10px}.camera-thumb{width:45px}.history-layout{grid-template-columns:1fr}.ranking-card{display:none}}
 @media (max-width:820px){.mockup-body{overflow:auto}.system-shell{height:auto;min-height:100vh;display:block}.map-pane{height:52vh;min-height:390px;border-right:0;border-bottom:8px solid #fff}.content-pane{overflow:visible;padding-bottom:86px}.summary-grid{grid-template-columns:repeat(3,1fr)}.monitor-filters{grid-template-columns:1fr 1fr}.monitor-filters .search-control{grid-column:1/-1}.table-wrap{max-height:none}.footer-navigation{position:fixed}.mock-label{bottom:18px}.map-legend{bottom:18px}.version-baseline{right:10px;bottom:68px}}
-@media (max-width:580px){.map-pane{height:47vh;min-height:330px}.map-title-card{left:10px;top:10px}.map-tools{right:10px;top:10px}.map-legend{display:none}.content-pane{padding:10px 10px 78px}.control-row{display:grid}.select-control{width:100%}.summary-grid{grid-template-columns:1fr}.summary-card{display:grid;grid-template-columns:1fr auto;align-items:center}.summary-card small{grid-column:1/-1}.basin-main{grid-template-columns:5px 22px 1fr 18px}.peak-value,.basin-count{display:none}.basin-meta{padding-left:43px;flex-wrap:wrap}.basin-meta strong{width:100%;margin:0}.hazard-grid,.sensor-alert-grid{grid-template-columns:1fr}.detail-summary-grid{grid-template-columns:1fr 1fr}.travel-timeline li{grid-template-columns:48px 1fr}.travel-timeline>li>strong{display:none}.station-row{grid-template-columns:42px 1fr 12px}.station-row .water-reading,.station-row .status-badge{display:none}.camera-thumb{width:42px}.camera-drawer{padding:13px;max-height:92vh}.video-mock{height:200px}.monitor-header{align-items:flex-start}.monitor-header h1{font-size:15px}.monitor-tabs{overflow:auto}.monitor-tabs button{white-space:nowrap}.monitor-filters{grid-template-columns:1fr}.monitor-filters .search-control{grid-column:auto}.footer-navigation a{min-width:46px}.footer-navigation b{font-size:6px}}
+@media (max-width:580px){.map-pane{height:47vh;min-height:330px}.map-title-card{left:10px;top:10px}.map-tools{right:10px;top:10px}.sensor-layer-panel{right:54px;top:119px;width:min(240px,calc(100% - 68px))}.map-legend{display:none}.content-pane{padding:10px 10px 78px}.control-row{display:grid}.select-control{width:100%}.summary-grid{grid-template-columns:1fr}.summary-card{display:grid;grid-template-columns:1fr auto;align-items:center}.summary-card small{grid-column:1/-1}.basin-main{grid-template-columns:5px 22px 1fr 18px}.peak-value,.basin-count{display:none}.basin-meta{padding-left:43px;flex-wrap:wrap}.basin-meta strong{width:100%;margin:0}.hazard-grid,.sensor-alert-grid{grid-template-columns:1fr}.detail-summary-grid{grid-template-columns:1fr 1fr}.travel-timeline li{grid-template-columns:48px 1fr}.travel-timeline>li>strong{display:none}.station-row{grid-template-columns:42px 1fr 12px}.station-row .water-reading,.station-row .status-badge{display:none}.camera-thumb{width:42px}.camera-drawer{padding:13px;max-height:92vh}.video-mock{height:200px}.monitor-header{align-items:flex-start}.monitor-header h1{font-size:15px}.monitor-tabs{overflow:auto}.monitor-tabs button{white-space:nowrap}.monitor-filters{grid-template-columns:1fr}.monitor-filters .search-control{grid-column:auto}.footer-navigation a{min-width:46px}.footer-navigation b{font-size:6px}}
 
 /* Production refinement: flatter, denser and aligned with the existing CCTV system */
 .system-shell{background:#f6f7f9}
@@ -439,8 +442,8 @@ window.ONWR_BASINS={"type":"FeatureCollection","name":"ONWR 22 Main River Basins
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version 1.1.5";
-    badge.title = "Patch version: v1.1.5 · baseline: v1.0-baseline";
+    badge.textContent = "Version 1.1.6";
+    badge.title = "Patch version: v1.1.6 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -467,6 +470,37 @@ window.ONWR_BASINS={"type":"FeatureCollection","name":"ONWR 22 Main River Basins
         button.disabled = false;
       }, 850);
     }, 650);
+  }
+
+  function initBasinSensorLayerControl() {
+    if (page !== "basin") return;
+    const panel = $("#sensorLayerPanel");
+    const panelToggle = $("#sensorLayerControlToggle");
+    const options = $$('[data-sensor-layer-toggle]');
+    if (!panel || !panelToggle || !options.length) return;
+    const state = window.basinSensorLayerState || {flow:true,rain:true};
+    window.basinSensorLayerState = state;
+
+    const applyLayerState = (type, visible, notify = true) => {
+      state[type] = visible;
+      document.body.classList.toggle(`sensor-${type}-layer-hidden`, !visible);
+      const option = $(`[data-sensor-layer-toggle="${type}"]`);
+      option?.classList.toggle("is-on", visible);
+      option?.setAttribute("aria-checked", String(visible));
+      if (notify) document.dispatchEvent(new CustomEvent("basin-sensor-layer-change", {detail:{type,visible}}));
+    };
+
+    options.forEach(option => option.addEventListener("click", () => {
+      const type = option.dataset.sensorLayerToggle;
+      applyLayerState(type, !state[type]);
+    }));
+    panelToggle.addEventListener("click", () => {
+      const expanded = panelToggle.getAttribute("aria-expanded") === "true";
+      panelToggle.setAttribute("aria-expanded", String(!expanded));
+      panel.hidden = expanded;
+    });
+    applyLayerState("flow", state.flow !== false, false);
+    applyLayerState("rain", state.rain !== false, false);
   }
 
   function initOverview() {
@@ -1273,11 +1307,11 @@ window.ONWR_BASINS={"type":"FeatureCollection","name":"ONWR 22 Main River Basins
     if (page === "basin") (activeDrilldown.sensors || []).forEach(sensor => {
       const [cx,cy] = projectCoordinate(sensor.coordinate);
       if (sensor.type === "rain") {
-        appendSvgElement(svg,"image",{x:(cx - 10).toFixed(1),y:(cy - 13).toFixed(1),width:20,height:25,href:RAIN_SENSOR_ICON,class:"real-sensor-rain-image","data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
+        appendSvgElement(svg,"image",{x:(cx - 10).toFixed(1),y:(cy - 13).toFixed(1),width:20,height:25,href:RAIN_SENSOR_ICON,class:"real-sensor-rain-image","data-sensor-layer":"rain","data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
       } else {
-        appendSvgElement(svg,"path",{d:`M ${cx} ${cy - 10} L ${cx - 10} ${cy + 8} L ${cx + 10} ${cy + 8} Z`,class:`real-sensor flow ${sensor.severity}`,"data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
+        appendSvgElement(svg,"path",{d:`M ${cx} ${cy - 10} L ${cx - 10} ${cy + 8} L ${cx + 10} ${cy + 8} Z`,class:`real-sensor flow ${sensor.severity}`,"data-sensor-layer":"flow","data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
       }
-      const label = appendSvgElement(svg,"text",{x:(cx + 10).toFixed(1),y:(cy + 3).toFixed(1),class:"real-sensor-label","data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
+      const label = appendSvgElement(svg,"text",{x:(cx + 10).toFixed(1),y:(cy + 3).toFixed(1),class:"real-sensor-label","data-sensor-layer":sensor.type,"data-map-filterable":"true","data-severity":sensor.severity,"data-province":sensor.province || sensor.area.replace("จังหวัด", "")});
       label.textContent = sensor.type === "rain" ? "ฝน" : "น้ำท่า";
     });
     if (page === "basin") (activeDrilldown.cctv || []).forEach(camera => {
@@ -1317,6 +1351,9 @@ window.ONWR_BASINS={"type":"FeatureCollection","name":"ONWR 22 Main River Basins
       const routeLayer = new GraphicsLayer({ title: "เส้นทางมวลน้ำ" });
       const provinceBoundaryLayer = new GraphicsLayer({ title: "ขอบเขตจังหวัดภายในลุ่มน้ำ" });
       const stationLayer = new GraphicsLayer({ title: "สถานีตรวจวัด" });
+      const sensorLayerState = window.basinSensorLayerState || {flow:true,rain:true};
+      const flowSensorLayer = new GraphicsLayer({ title:"สถานีวัดระดับน้ำท่า", visible:sensorLayerState.flow !== false });
+      const rainSensorLayer = new GraphicsLayer({ title:"สถานีวัดระดับน้ำฝน", visible:sensorLayerState.rain !== false });
       const basinLabelLayer = new GraphicsLayer({ title: "ชื่อลุ่มน้ำแจ้งเตือน", listMode:"hide" });
       basinLayer.addMany(basinFeatures.map(feature => createPolygonGraphic(Graphic, feature)));
       if (page === "overview") basinLabelLayer.addMany(
@@ -1331,11 +1368,14 @@ window.ONWR_BASINS={"type":"FeatureCollection","name":"ONWR 22 Main River Basins
           symbol:{type:"simple-marker",color:station.severity === "red" ? "#e34b4b" : station.severity === "orange" ? "#f28a2e" : "#f4c430",size:13,outline:{color:"#fff",width:2}},
           attributes:{code:station.code,category:"station",severity:station.severity,province:station.province},popupTemplate:{title:`${station.code} · ${station.name}`,content:`ต.${station.subdistrict} อ.${station.district} จ.${station.province}<br><b>ระดับน้ำ ${station.level} เมตร</b><br>สถานะ ${waterSeverityLabel(station.severity)}`}
         })));
-        (drilldown.sensors || []).forEach(sensor => stationLayer.add(new Graphic({
-          geometry:{type:"point",longitude:sensor.coordinate[0],latitude:sensor.coordinate[1]},
-          symbol:{type:"picture-marker",url:sensorMarkerDataUri(sensor.type,sensor.severity),width:21,height:21,xoffset:0,yoffset:8},
-          attributes:{sensorCode:sensor.code,category:"sensor",severity:sensor.severity,province:sensor.province || sensor.area.replace("จังหวัด", "")},popupTemplate:{title:sensor.type === "rain" ? "Sensor ปริมาณฝน" : "Sensor น้ำท่า",content:`${sensor.name}<br><b>${sensor.value}</b><br>${sensor.criterion}`}
-        })));
+        (drilldown.sensors || []).forEach(sensor => {
+          const targetLayer = sensor.type === "rain" ? rainSensorLayer : flowSensorLayer;
+          targetLayer.add(new Graphic({
+            geometry:{type:"point",longitude:sensor.coordinate[0],latitude:sensor.coordinate[1]},
+            symbol:{type:"picture-marker",url:sensorMarkerDataUri(sensor.type,sensor.severity),width:21,height:21,xoffset:0,yoffset:8},
+            attributes:{sensorCode:sensor.code,category:"sensor",sensorType:sensor.type,severity:sensor.severity,province:sensor.province || sensor.area.replace("จังหวัด", "")},popupTemplate:{title:sensor.type === "rain" ? "Sensor ปริมาณฝน" : "Sensor น้ำท่า",content:`${sensor.name}<br><b>${sensor.value}</b><br>${sensor.criterion}`}
+          }));
+        });
         (drilldown.cctv || []).forEach(camera => stationLayer.add(new Graphic({
           geometry:{type:"point",longitude:camera.coordinate[0],latitude:camera.coordinate[1]},
           symbol:{type:"picture-marker",url:cctvMarkerUrl(camera.severity),width:28,height:28,xoffset:0,yoffset:10},
@@ -1395,8 +1435,8 @@ window.ONWR_BASINS={"type":"FeatureCollection","name":"ONWR 22 Main River Basins
         }
       }) : null;
       const operationalLayers = streamLayer
-        ? [basinLayer,streamLayer,provinceBoundaryLayer,routeLayer,stationLayer,basinLabelLayer]
-        : [basinLayer,provinceBoundaryLayer,routeLayer,stationLayer,basinLabelLayer];
+        ? [basinLayer,streamLayer,provinceBoundaryLayer,routeLayer,flowSensorLayer,rainSensorLayer,stationLayer,basinLabelLayer]
+        : [basinLayer,provinceBoundaryLayer,routeLayer,flowSensorLayer,rainSensorLayer,stationLayer,basinLabelLayer];
       const map = new Map({ basemap:"topo-vector", layers:operationalLayers });
       const view = new MapView({
         container:"viewDiv",
@@ -1431,12 +1471,17 @@ window.ONWR_BASINS={"type":"FeatureCollection","name":"ONWR 22 Main River Basins
       if (page === "basin") {
         const normalizeCode = code => String(code || "").replace(/-/g, "").toUpperCase();
         window.filterBasinMap = (criteria = "all", province = "all") => {
-          stationLayer.graphics.forEach(graphic => {
-            const criteriaMatch = criteria === "all" || graphic.attributes?.severity === criteria;
-            const provinceMatch = province === "all" || graphic.attributes?.province === province;
-            graphic.visible = criteriaMatch && provinceMatch;
-          });
+          [stationLayer,flowSensorLayer,rainSensorLayer].forEach(layer => layer.graphics.forEach(graphic => {
+              const criteriaMatch = criteria === "all" || graphic.attributes?.severity === criteria;
+              const provinceMatch = province === "all" || graphic.attributes?.province === province;
+              graphic.visible = criteriaMatch && provinceMatch;
+            })
+          );
         };
+        document.addEventListener("basin-sensor-layer-change", event => {
+          const layer = event.detail?.type === "rain" ? rainSensorLayer : flowSensorLayer;
+          if (event.detail?.type === "rain" || event.detail?.type === "flow") layer.visible = event.detail.visible;
+          });
         window.focusBasinStation = code => {
           const matches = [...stationLayer.graphics].filter(graphic => normalizeCode(graphic.attributes?.code) === normalizeCode(code));
           const graphic = matches.find(item => item.attributes?.category === "cctv") || matches[0];
@@ -1472,6 +1517,7 @@ window.ONWR_BASINS={"type":"FeatureCollection","name":"ONWR 22 Main River Basins
 
   updateClock();
   initVersionBadge();
+  initBasinSensorLayerControl();
   window.setInterval(updateClock, 1000);
   renderFallbackBasins();
   if (page === "overview") initOverview();
