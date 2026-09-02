@@ -10,8 +10,8 @@
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version 1.1.8";
-    badge.title = "Patch version: v1.1.8 · baseline: v1.0-baseline";
+    badge.textContent = "Version 1.1.9";
+    badge.title = "Patch version: v1.1.9 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -181,7 +181,7 @@
     const summarySeverities = ["red","orange","yellow","blue","green"];
     let activeProvince = "all";
     let activeCriteria = "all";
-    let activeSensorType = "rain";
+    let activeSensorType = "flow";
     const tableSortState = {
       risk:{key:"severity",direction:"desc"},
       summary:{key:"code",direction:"asc"}
