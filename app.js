@@ -10,8 +10,8 @@
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version 1.2.0";
-    badge.title = "Minor version: v1.2.0 · baseline: v1.0-baseline";
+    badge.textContent = "Version 1.2.1";
+    badge.title = "Patch version: v1.2.1 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -539,7 +539,12 @@
     const stations = window.MONITOR_STATIONS || [];
     const metadata = window.MONITOR_META || {source:"Daily Report CCTV"};
     const regionOrder = ["ภาคเหนือ","ภาคกลาง","ภาคตะวันออกเฉียงเหนือ","ภาคตะวันออก","ภาคใต้"];
-    const regionColors = {"ภาคเหนือ":"#5669f5","ภาคกลาง":"#29c99a","ภาคตะวันออกเฉียงเหนือ":"#f4bd2a","ภาคตะวันออก":"#ed8b2f","ภาคใต้":"#54a8e7"};
+    const thresholdOrder = ["normal","watch","prepare","evacuate","critical","nodata"];
+    const thresholdMeta = {
+      normal:{label:"อุปกรณ์ปกติสมบูรณ์",color:"#32d89a"}, watch:{label:"เฝ้าระวังอย่างใกล้ชิด",color:"#4aa8ed"},
+      prepare:{label:"เตรียมพร้อมรับมือสถานการณ์",color:"#f4bd2a"}, evacuate:{label:"ให้อพยพและปฏิบัติตามเกณฑ์กำหนด",color:"#ed8b2f"},
+      critical:{label:"ต้องอพยพและปฏิบัติตามข้อสั่งการ",color:"#ef4b55"}, nodata:{label:"ยังไม่มีข้อมูล",color:"#747986"}
+    };
     let activeMode = "all";
     let activeRegion = "all";
     let activeProvince = "all";
@@ -561,14 +566,14 @@
     };
 
     const renderOverview = () => {
-      const scope = baseStations();
-      const regionCounts = countBy(scope,"region");
+      const scope = baseStations().filter(item => (activeRegion === "all" || item.region === activeRegion) && (activeProvince === "all" || item.province === activeProvince));
+      const thresholdCounts = countBy(scope,"alertLevel");
       const total = scope.length || 1;
       let cumulative = 0;
-      const segments = regionOrder.map(region => {
+      const segments = thresholdOrder.map(level => {
         const start = cumulative;
-        cumulative += (regionCounts[region] || 0) / total * 100;
-        return `${regionColors[region]} ${start.toFixed(2)}% ${cumulative.toFixed(2)}%`;
+        cumulative += (thresholdCounts[level] || 0) / total * 100;
+        return `${thresholdMeta[level].color} ${start.toFixed(2)}% ${cumulative.toFixed(2)}%`;
       });
       const donut = $("#monitorRegionDonut");
       if (donut) {
@@ -576,11 +581,11 @@
         donut.innerHTML = `<div><b>${scope.length}</b><span>${activeMode === "abnormal" ? "สถานีผิดปกติ" : "สถานีทั้งหมด"}</span></div>`;
       }
       const regionList = $("#monitorRegionList");
-      if (regionList) regionList.innerHTML = regionOrder.map(region => `<button type="button" data-region-summary="${region}" class="${activeRegion === region ? "active" : ""}"><i style="background:${regionColors[region]}"></i><span>${region}</span><b>${regionCounts[region] || 0}</b><small>สถานี</small></button>`).join("");
-      const provinceScope = scope.filter(item => activeRegion === "all" || item.region === activeRegion);
+      if (regionList) regionList.innerHTML = thresholdOrder.map(level => `<div><i style="background:${thresholdMeta[level].color}"></i><span>${thresholdMeta[level].label}</span><b>${thresholdCounts[level] || 0}</b><small>สถานี</small></div>`).join("");
+      const provinceScope = baseStations().filter(item => activeRegion === "all" || item.region === activeRegion);
       const provinceCounts = Object.entries(countBy(provinceScope,"province")).sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0],"th"));
       const maxProvince = Math.max(1,...provinceCounts.map(([,count]) => count));
-      $("#monitorProvinceTitle").textContent = activeRegion === "all" ? "จังหวัดทั้งหมด" : `จังหวัดใน${activeRegion}`;
+      $("#monitorProvinceTitle").textContent = activeRegion === "all" ? "จังหวัดที่มีสถานีสูงสุด" : `จังหวัดใน${activeRegion}`;
       $("#monitorProvinceHint").textContent = `${provinceCounts.length} จังหวัด`;
       const bars = $("#monitorProvinceBars");
       if (bars) bars.innerHTML = provinceCounts.map(([province,count]) => `<button type="button" data-province-summary="${escapeHtml(province)}" class="${activeProvince === province ? "active" : ""}"><span>${escapeHtml(province)}</span><i><em style="width:${(count / maxProvince * 100).toFixed(1)}%"></em></i><b>${count}</b><small>สถานี</small></button>`).join("");
@@ -619,15 +624,6 @@
     status?.addEventListener("change", applyTableFilter);
     regionSelect?.addEventListener("change", () => { activeRegion = regionSelect.value; activeProvince = "all"; refreshProvinceOptions(); render(); });
     provinceSelect?.addEventListener("change", () => { activeProvince = provinceSelect.value; render(); });
-    $("#monitorRegionList")?.addEventListener("click", event => {
-      const button = event.target.closest("[data-region-summary]");
-      if (!button) return;
-      activeRegion = activeRegion === button.dataset.regionSummary ? "all" : button.dataset.regionSummary;
-      activeProvince = "all";
-      regionSelect.value = activeRegion;
-      refreshProvinceOptions();
-      render();
-    });
     $("#monitorProvinceBars")?.addEventListener("click", event => {
       const button = event.target.closest("[data-province-summary]");
       if (!button) return;

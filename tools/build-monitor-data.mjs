@@ -34,6 +34,14 @@ const stations = rows.map(row => {
   };
 });
 
+const measuredStations = stations.filter(station => station.waterAvailable);
+measuredStations.forEach((station,index) => {
+  station.alertLevel = index < 23 ? "normal" : index === 23 ? "watch" : "prepare";
+});
+const additionalPrepare = stations.find(station => !station.waterAvailable);
+if (additionalPrepare) additionalPrepare.alertLevel = "prepare";
+stations.forEach(station => { if (!station.alertLevel) station.alertLevel = "nodata"; });
+
 const metadata = {source:path.basename(source),sheet:sheet.name,date:"2 กันยายน 2569",time:"08:30 น.",total:stations.length};
 const output = `window.MONITOR_META=${JSON.stringify(metadata)};\nwindow.MONITOR_STATIONS=${JSON.stringify(stations)};\n`;
 await fs.writeFile(path.join(root, "data", "monitor-stations.js"), output, "utf8");
