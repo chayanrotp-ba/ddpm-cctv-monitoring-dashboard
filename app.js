@@ -10,8 +10,8 @@
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version 1.1.9";
-    badge.title = "Patch version: v1.1.9 · baseline: v1.0-baseline";
+    badge.textContent = "Version 1.1.10";
+    badge.title = "Patch version: v1.1.10 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -890,7 +890,10 @@
   }
 
   function sensorMarkerDataUri(type, severity) {
-    if (type === "rain") return new URL(RAIN_SENSOR_ICON, window.location.href).href;
+    if (type === "rain") {
+      const drop = '<path d="M20 2C15 10 7 19 7 28a13 13 0 0 0 26 0C33 19 25 10 20 2Z" fill="#9fc3f2"/><path d="M13 27c0 6 4 10 9 11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>';
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 42">${drop}</svg>`)}`;
+    }
     const color = ({red:"#ff0000",orange:"#E86011",yellow:"#F4D439",blue:"#56a9e8",green:"#2fc88f"})[severity] || "#2fc88f";
     const shape = '<path d="M20 4 4 34h32Z" fill="' + color + '" stroke="#5d6672" stroke-width="2" stroke-linejoin="round"/>';
     return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">${shape}</svg>`)}`;
@@ -938,7 +941,7 @@
           const targetLayer = sensor.type === "rain" ? rainSensorLayer : flowSensorLayer;
           targetLayer.add(new Graphic({
             geometry:{type:"point",longitude:sensor.coordinate[0],latitude:sensor.coordinate[1]},
-            symbol:{type:"picture-marker",url:sensorMarkerDataUri(sensor.type,sensor.severity),width:21,height:21,xoffset:0,yoffset:8},
+            symbol:{type:"picture-marker",url:sensorMarkerDataUri(sensor.type,sensor.severity),width:sensor.type === "rain" ? 24 : 21,height:sensor.type === "rain" ? 30 : 21,xoffset:0,yoffset:sensor.type === "rain" ? 10 : 8},
             attributes:{sensorCode:sensor.code,category:"sensor",sensorType:sensor.type,severity:sensor.severity,province:sensor.province || sensor.area.replace("จังหวัด", "")},popupTemplate:{title:sensor.type === "rain" ? "Sensor ปริมาณฝน" : "Sensor น้ำท่า",content:`${sensor.name}<br><b>${sensor.value}</b><br>${sensor.criterion}`}
           }));
         });
@@ -1001,8 +1004,8 @@
         }
       }) : null;
       const operationalLayers = streamLayer
-        ? [basinLayer,streamLayer,provinceBoundaryLayer,routeLayer,flowSensorLayer,rainSensorLayer,stationLayer,basinLabelLayer]
-        : [basinLayer,provinceBoundaryLayer,routeLayer,flowSensorLayer,rainSensorLayer,stationLayer,basinLabelLayer];
+        ? [basinLayer,streamLayer,provinceBoundaryLayer,routeLayer,stationLayer,flowSensorLayer,rainSensorLayer,basinLabelLayer]
+        : [basinLayer,provinceBoundaryLayer,routeLayer,stationLayer,flowSensorLayer,rainSensorLayer,basinLabelLayer];
       const map = new Map({ basemap:"topo-vector", layers:operationalLayers });
       const view = new MapView({
         container:"viewDiv",
