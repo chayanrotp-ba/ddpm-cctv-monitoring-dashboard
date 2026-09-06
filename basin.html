@@ -83,8 +83,8 @@
       </header>
 
       <section class="detail-summary-grid high-peak-summary-grid" aria-label="สรุปตัวเลขสถานการณ์ลุ่มน้ำ">
-        <article class="critical"><span>CCTV ที่เข้าเกณฑ์</span><b id="summaryStationTotal">16 จุด</b><small id="summaryStationBreakdown">ต้องอพยพ 6 · อพยพ 4 · เตรียมรับมือ 2 · เฝ้าระวัง 2 · ติดตาม 2</small></article>
-        <article><span>High Peak สูงสุด</span><b id="summaryHighPeakValue">8.42 ม.</b><small id="summaryHighPeakNote">NAN01 · เกินเกณฑ์ +0.62 ม.</small></article>
+        <article class="critical"><span>สถานีที่เข้าเกณฑ์เฝ้าระวัง</span><b id="summaryStationTotal">16 จุด</b><small class="criteria-breakdown" id="summaryStationBreakdown"><span class="red"><i></i>ต้องอพยพ 6</span><span class="orange"><i></i>อพยพ 4</span><span class="yellow"><i></i>เตรียมรับมือ 2</span><span class="blue"><i></i>เฝ้าระวัง 2</span><span class="green"><i></i>ติดตาม 2</span></small></article>
+        <article class="high-risk-focus"><span>สถานีเสี่ยงสูงสุด · High Peak</span><b id="summaryHighPeakValue">8.42 ม.</b><small id="summaryHighPeakNote">NAN01 · เกินเกณฑ์ +0.62 ม.</small></article>
         <article><span>แนวโน้มเพิ่มสูงสุด</span><b id="summaryTrendValue">+0.38 ม./ชม.</b><small id="summaryTrendNote">NAN01 · สะพานปอน</small></article>
         <article><span>ข้อมูลล่าสุด</span><b>10:40 น.</b><small>28/08/2569 · อัปเดตทุก 5 นาที</small></article>
       </section>
@@ -93,22 +93,21 @@
         <div class="top-risk-heading">
           <div class="top-risk-title"><p>TOP RISK CCTV</p><h2>สถานีเฝ้าระวัง ความเสี่ยงสูงสุด</h2><strong id="topRiskHeadline"><i class="filter-dot red"></i>ต้องอพยพ 6 จุด <small>· แสดงครบทุกสถานี</small></strong><span class="top-risk-scope" id="topRiskScope">ทุกจังหวัด · 16 สถานี</span></div>
           <div class="top-risk-side">
-            <div class="risk-summary" id="riskSummary" aria-label="สรุปจำนวนสถานีเฝ้าระวังความเสี่ยงสูง"><span class="red"><i></i>ต้องอพยพ <b>6</b></span><span class="orange"><i></i>อพยพ <b>4</b></span><span class="yellow"><i></i>เตรียมรับมือ <b>2</b></span></div>
-            <span class="all-visible-count">แสดงทั้งหมด <small id="basinStationCount">16 จุด</small></span>
+            <div class="risk-summary" id="riskSummary" aria-label="สรุปจำนวนสถานีเร่งด่วน 3 ระดับ"><span class="red"><i></i>ต้องอพยพ <b>6</b></span><span class="orange"><i></i>อพยพ <b>4</b></span><span class="yellow"><i></i>เตรียมรับมือ <b>2</b></span></div>
           </div>
         </div>
-        <p class="station-table-note" id="basinStationNote">แสดงเฉพาะ 3 ระดับความเสี่ยงสูงตามตัวกรอง · กดหัวตารางเพื่อเรียงข้อมูล</p>
+        <p class="station-table-note" id="basinStationNote">แสดงเฉพาะ 3 ระดับเร่งด่วนตามตัวกรอง · กดหัวตารางเพื่อเรียงข้อมูล</p>
         <div class="table-wrap basin-station-table-wrap">
           <table class="data-table basin-station-table">
-            <thead><tr><th>ลำดับ</th><th><button class="table-sort-button" type="button" data-table-sort="risk" data-sort-key="code">CCTV / สถานี</button></th><th><button class="table-sort-button" type="button" data-table-sort="risk" data-sort-key="level">ระดับน้ำ</button></th><th><button class="table-sort-button" type="button" data-table-sort="risk" data-sort-key="bank">ระดับตลิ่ง</button></th><th>เวลาล่าสุด</th><th><button class="table-sort-button active desc" type="button" data-table-sort="risk" data-sort-key="severity">ระดับเตือนภัย</button></th><th>สถานะกล้อง</th></tr></thead>
+            <thead><tr><th>ลำดับ</th><th><button class="table-sort-button" type="button" data-table-sort="risk" data-sort-key="code">CCTV / สถานี / ที่ตั้ง</button></th><th><button class="table-sort-button" type="button" data-table-sort="risk" data-sort-key="level">ระดับน้ำ</button></th><th><button class="table-sort-button" type="button" data-table-sort="risk" data-sort-key="bank">ระดับตลิ่ง</button></th><th><button class="table-sort-button" type="button" data-table-sort="risk" data-sort-key="excess">เกินเกณฑ์</button></th><th><button class="table-sort-button" type="button" data-table-sort="risk" data-sort-key="trend">แนวโน้ม</button></th><th><button class="table-sort-button active desc" type="button" data-table-sort="risk" data-sort-key="severity">ระดับเตือนภัย</button></th><th>เวลาล่าสุด</th><th>เครื่องมือ</th></tr></thead>
             <tbody id="basinStationRows"></tbody>
           </table>
         </div>
       </section>
 
       <section class="station-section basin-all-stations-section">
-        <div class="section-heading compact station-summary-heading"><div><p>STATION SUMMARY</p><h2>ตารางสรุปสถานีในลุ่มน้ำ</h2></div><div class="station-summary-tools"><div class="risk-summary station-summary-risk" id="stationSummaryRisk" aria-label="สรุปสถานีครบ 5 ระดับ"><span class="red"><i></i>ต้องอพยพ <b>6</b></span><span class="orange"><i></i>อพยพ <b>4</b></span><span class="yellow"><i></i>เตรียมรับมือ <b>2</b></span><span class="blue"><i></i>เฝ้าระวัง <b>2</b></span><span class="green"><i></i>ติดตาม <b>2</b></span></div><div class="station-summary-metric"><span>สถานีตามตัวกรอง</span><b id="basinAllStationCount">16 จุด</b><small id="stationSummaryBreakdown">ครบ 5 ระดับตามจังหวัดที่เลือก</small></div></div></div>
-        <p class="station-table-note">แสดงทุกสถานีครบ 5 ระดับตามจังหวัด · ค่าเริ่มต้นเรียงรหัสสถานี และกดหัวตารางเพื่อเปลี่ยนลำดับ</p>
+        <div class="section-heading compact station-summary-heading"><div><p>STATION SUMMARY</p><h2>ตารางสรุปสถานีในลุ่มน้ำ</h2></div><div class="station-summary-tools"><div class="risk-summary station-summary-risk station-follow-summary" id="stationSummaryRisk" aria-label="สรุปสถานีที่ต้องติดตาม"><span class="blue"><i></i>เฝ้าระวัง <b>2</b></span><span class="green"><i></i>ติดตาม <b>4</b></span></div><div class="station-summary-metric"><span>สถานีตามตัวกรอง</span><b id="basinAllStationCount">6 จุด</b><small id="stationSummaryBreakdown">เฉพาะเฝ้าระวังและติดตาม · ทุกจังหวัด</small></div></div></div>
+        <p class="station-table-note">แสดงเฉพาะสถานีระดับเฝ้าระวังสีฟ้าและติดตามสีเขียวตามจังหวัด · ค่าเริ่มต้นเรียงรหัสสถานี และกดหัวตารางเพื่อเปลี่ยนลำดับ</p>
         <div class="table-wrap basin-all-station-table-wrap">
           <table class="data-table basin-all-station-table">
             <thead><tr><th>ลำดับ</th><th><button class="table-sort-button active asc" type="button" data-table-sort="summary" data-sort-key="code">CCTV / สถานี / ที่ตั้ง</button></th><th><button class="table-sort-button" type="button" data-table-sort="summary" data-sort-key="level">ระดับน้ำ</button></th><th><button class="table-sort-button" type="button" data-table-sort="summary" data-sort-key="bank">ระดับตลิ่ง</button></th><th><button class="table-sort-button" type="button" data-table-sort="summary" data-sort-key="excess">เกินเกณฑ์</button></th><th><button class="table-sort-button" type="button" data-table-sort="summary" data-sort-key="trend">แนวโน้ม</button></th><th><button class="table-sort-button" type="button" data-table-sort="summary" data-sort-key="severity">ระดับเตือนภัย</button></th><th>เวลาล่าสุด</th><th>เครื่องมือ</th></tr></thead>

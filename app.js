@@ -10,8 +10,8 @@
     if (!["overview","basin","monitor"].includes(page) || $(".version-baseline")) return;
     const badge = document.createElement("div");
     badge.className = "version-baseline";
-    badge.textContent = "Version 1.2.1";
-    badge.title = "Patch version: v1.2.1 · baseline: v1.0-baseline";
+    badge.textContent = "Version 1.2.2";
+    badge.title = "Patch version: v1.2.2 · baseline: v1.0-baseline";
     document.body.appendChild(badge);
   }
 
@@ -177,8 +177,9 @@
     const stationRecords = detailStationRecords(detail);
     const severityOrder = { red:5, orange:4, yellow:3, blue:2, green:1 };
     const severityLabels = { red:"ต้องอพยพ", orange:"อพยพ", yellow:"เตรียมรับมือ", blue:"เฝ้าระวัง", green:"ติดตาม" };
-    const riskSeverities = ["red","orange","yellow"];
     const summarySeverities = ["red","orange","yellow","blue","green"];
+    const riskSeverities = ["red","orange","yellow"];
+    const followSeverities = ["blue","green"];
     let activeProvince = "all";
     let activeCriteria = "all";
     let activeSensorType = "flow";
@@ -218,10 +219,6 @@
       const tools = includeTools ? `<td><div class="station-tools"><button class="station-tool" type="button" data-station-action="history" data-station-code="${station.code}" title="กราฟระดับน้ำย้อนหลัง" aria-label="กราฟระดับน้ำย้อนหลัง ${station.code}">⌁</button><button class="station-tool" type="button" data-station-action="analysis" data-station-code="${station.code}" title="ผลวิเคราะห์ระดับน้ำ" aria-label="ผลวิเคราะห์ระดับน้ำ ${station.code}">▣</button></div></td>` : "";
       return `<tr data-focus-station="${station.code}" tabindex="0" role="button" aria-label="เลื่อนไปยัง ${station.code} บนแผนที่"><td>${index + 1}</td><td><b>${station.code} · ${station.name}</b><small>${location}</small></td><td><span class="basin-water-value ${station.severity}">${level.toFixed(2)} ม.</span></td><td><b class="difference-value ${station.severity}">+${difference.toFixed(2)} ม.</b></td><td><span class="trend-value ${station.severity}">${direction} ${Math.abs(Number(station.trend)).toFixed(2)} ม./ชม.</span></td><td><span class="station-status ${station.severity}">${severityLabels[station.severity]}</span></td>${tools}</tr>`;
     };
-    const topRiskRowMarkup = (station,index) => {
-      const cameraState = station.code === "NAN03" ? {label:"ข้อมูลล่าช้า",className:"delay",time:"10:22 น."} : {label:"ออนไลน์",className:"online",time:"10:40 น."};
-      return `<tr data-focus-station="${station.code}" tabindex="0" role="button" aria-label="เลื่อนไปยัง ${station.code} บนแผนที่"><td>${index + 1}</td><td><b>${station.code} · ${station.name}</b><small>${stationLocationText(station)}</small></td><td><span class="basin-water-value ${station.severity}">${Number(station.level).toFixed(2)} ม.</span></td><td><span class="bank-value">${stationBank(station).toFixed(2)} ม.</span></td><td><time>${cameraState.time}</time></td><td><span class="station-status ${station.severity}">${severityLabels[station.severity]}</span></td><td><span class="camera-health ${cameraState.className}"><i></i>${cameraState.label}</span></td></tr>`;
-    };
     const fullStationRowMarkup = (station,index) => {
       const level = Number(station.level);
       const bank = stationBank(station);
@@ -229,6 +226,7 @@
       const direction = Number(station.trend) > 0 ? "↑" : Number(station.trend) < 0 ? "↓" : "−";
       return `<tr data-focus-station="${station.code}" tabindex="0" role="button" aria-label="เลื่อนไปยัง ${station.code} บนแผนที่"><td>${index + 1}</td><td><b>${station.code} · ${station.name}</b><small>${stationLocationText(station)}</small></td><td><span class="basin-water-value ${station.severity}">${level.toFixed(2)} ม.</span></td><td><span class="bank-value">${bank.toFixed(2)} ม.</span></td><td><b class="difference-value ${station.severity}">+${difference.toFixed(2)} ม.</b></td><td><span class="trend-value ${station.severity}">${direction} ${Math.abs(Number(station.trend)).toFixed(2)} ม./ชม.</span></td><td><span class="station-status ${station.severity}">${severityLabels[station.severity] || station.statusLabel || "—"}</span></td><td><time>28/08/2569 10:40 น.</time></td><td><div class="station-tools"><button class="station-tool" type="button" data-station-action="history" data-station-code="${station.code}" title="กราฟระดับน้ำย้อนหลัง" aria-label="กราฟระดับน้ำย้อนหลัง ${station.code}">⌁</button><button class="station-tool" type="button" data-station-action="analysis" data-station-code="${station.code}" title="ผลวิเคราะห์ระดับน้ำ" aria-label="ผลวิเคราะห์ระดับน้ำ ${station.code}">▣</button></div></td></tr>`;
     };
+    const topRiskRowMarkup = (station,index) => fullStationRowMarkup(station,index);
     const sortStationsForTable = (stations, state) => {
       const direction = state.direction === "asc" ? 1 : -1;
       const numericValue = (station, key) => key === "bank" ? stationBank(station) : key === "excess" ? stationExcess(station) : Number(station[key]);
@@ -256,7 +254,10 @@
       const rankedStations = rankStations(visibleStations);
       const riskRankedStations = rankStations(visibleStations.filter(station => riskSeverities.includes(station.severity)));
       const topStations = sortStationsForTable(riskRankedStations,tableSortState.risk);
-      const summaryStations = sortStationsForTable(visibleStations,tableSortState.summary);
+      const summaryStations = sortStationsForTable(
+        visibleStations.filter(station => followSeverities.includes(station.severity)),
+        tableSortState.summary
+      );
       latestRankedStations = rankedStations;
       const visibleSensors = (detail.sensors || []).filter(matchesFilters);
       const visibleCctv = (detail.cctv || []).filter(matchesFilters);
@@ -284,7 +285,7 @@
       if (highPeakValue) highPeakValue.textContent = highestStation ? `${Number(highestStation.level).toFixed(2)} ม.` : "—";
       if (highPeakNote) highPeakNote.textContent = highestStation ? `${highestStation.code} · เกินเกณฑ์ +${stationExcess(highestStation).toFixed(2)} ม.` : "ไม่พบข้อมูลตามตัวกรอง";
       if (summaryStationTotal) summaryStationTotal.textContent = `${visibleStations.length} จุด`;
-      if (summaryStationBreakdown) summaryStationBreakdown.textContent = summarySeverities.map(severity => `${severityLabels[severity]} ${stationCounts[severity]}`).join(" · ");
+      if (summaryStationBreakdown) summaryStationBreakdown.innerHTML = summarySeverities.map(severity => `<span class="${severity}"><i></i>${severityLabels[severity]} ${stationCounts[severity]}</span>`).join("");
       if (summaryTrendValue) summaryTrendValue.textContent = fastestStation ? `${Number(fastestStation.trend) >= 0 ? "+" : ""}${Number(fastestStation.trend).toFixed(2)} ม./ชม.` : "—";
       if (summaryTrendNote) summaryTrendNote.textContent = fastestStation ? `${fastestStation.code} · ${fastestStation.name}` : "ไม่พบข้อมูลตามตัวกรอง";
       const topRiskHeadline = $("#topRiskHeadline");
@@ -321,19 +322,17 @@
           : `<tr>${common}<td><span class="sensor-reading ${sensor.severity}">${Number.parseFloat(sensor.value).toFixed(2)} ม.</span></td><td><span class="bank-value">${threshold === "—" ? threshold : Number(threshold).toFixed(2) + " ม."}</span></td></tr>`;
       }).join("") : `<tr><td colspan="${activeSensorType === "rain" ? 5 : 6}"><div class="empty-state">ไม่พบ Sensor ประเภทนี้ตามตัวกรองที่เลือก</div></td></tr>`;
 
-      const stationCount = $("#basinStationCount");
-      if (stationCount) stationCount.textContent = `${topStations.length} จุด`;
       const stationNote = $("#basinStationNote");
-      if (stationNote) stationNote.textContent = `แสดงครบ ${topStations.length} จุดที่เข้าเกณฑ์ตามตัวกรอง · เรียงระดับความเสี่ยงและค่าที่เกินเกณฑ์จากมากไปน้อย`;
+      if (stationNote) stationNote.textContent = `แสดง ${topStations.length} จุด เฉพาะ 3 ระดับเร่งด่วนตามตัวกรอง · เรียงระดับความเสี่ยงและค่าที่เกินเกณฑ์จากมากไปน้อย`;
       if (stationRows) stationRows.innerHTML = topStations.length
         ? topStations.map((station,index) => topRiskRowMarkup(station,index)).join("")
-        : `<tr><td colspan="7"><div class="empty-state">ไม่พบสถานีตามตัวกรองที่เลือก</div></td></tr>`;
+        : `<tr><td colspan="9"><div class="empty-state">ไม่พบสถานีตามตัวกรองที่เลือก</div></td></tr>`;
       const basinAllStationCount = $("#basinAllStationCount");
       if (basinAllStationCount) basinAllStationCount.textContent = `${summaryStations.length} จุด`;
       const stationSummaryBreakdown = $("#stationSummaryBreakdown");
-      if (stationSummaryBreakdown) stationSummaryBreakdown.textContent = `ครบ 5 ระดับ · ${activeProvince === "all" ? "ทุกจังหวัด" : `จังหวัด${activeProvince}`}`;
+      if (stationSummaryBreakdown) stationSummaryBreakdown.textContent = `เฉพาะเฝ้าระวังและติดตาม · ${activeProvince === "all" ? "ทุกจังหวัด" : `จังหวัด${activeProvince}`}`;
       const stationSummaryRisk = $("#stationSummaryRisk");
-      if (stationSummaryRisk) stationSummaryRisk.innerHTML = summarySeverities.map(severity => `<span class="${severity}"><i></i>${severityLabels[severity]} <b>${stationCounts[severity]}</b></span>`).join("");
+      if (stationSummaryRisk) stationSummaryRisk.innerHTML = followSeverities.map(severity => `<span class="${severity}"><i></i>${severityLabels[severity]} <b>${stationCounts[severity]}</b></span>`).join("");
       if (basinAllStationRows) basinAllStationRows.innerHTML = summaryStations.length
         ? summaryStations.map((station,index) => fullStationRowMarkup(station,index)).join("")
         : `<tr><td colspan="9"><div class="empty-state">ไม่พบสถานีตามตัวกรองที่เลือก</div></td></tr>`;
@@ -545,7 +544,11 @@
       prepare:{label:"เตรียมพร้อมรับมือสถานการณ์",color:"#f4bd2a"}, evacuate:{label:"ให้อพยพและปฏิบัติตามเกณฑ์กำหนด",color:"#ed8b2f"},
       critical:{label:"ต้องอพยพและปฏิบัติตามข้อสั่งการ",color:"#ef4b55"}, nodata:{label:"ยังไม่มีข้อมูล",color:"#747986"}
     };
-    let activeMode = "all";
+    const regionMeta = {
+      "ภาคเหนือ":"#5267f5", "ภาคกลาง":"#32d89a", "ภาคตะวันออกเฉียงเหนือ":"#f4bd2a",
+      "ภาคตะวันออก":"#ed8b2f", "ภาคใต้":"#9b6fe8"
+    };
+    let activeMode = "threshold";
     let activeRegion = "all";
     let activeProvince = "all";
     let visibleStations = [];
@@ -556,7 +559,7 @@
     const tableBody = $("#deviceTable");
     const escapeHtml = value => String(value ?? "").replace(/[&<>\"]/g, character => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[character]);
     const countBy = (items, key) => items.reduce((counts,item) => ((counts[item[key]] = (counts[item[key]] || 0) + 1),counts),{});
-    const baseStations = () => activeMode === "abnormal" ? stations.filter(item => item.status !== "online") : stations;
+    const baseStations = () => stations;
 
     const refreshProvinceOptions = () => {
       const provinces = [...new Set(stations.filter(item => activeRegion === "all" || item.region === activeRegion).map(item => item.province))].sort((a,b) => a.localeCompare(b,"th"));
@@ -566,29 +569,60 @@
     };
 
     const renderOverview = () => {
-      const scope = baseStations().filter(item => (activeRegion === "all" || item.region === activeRegion) && (activeProvince === "all" || item.province === activeProvince));
-      const thresholdCounts = countBy(scope,"alertLevel");
-      const total = scope.length || 1;
-      let cumulative = 0;
-      const segments = thresholdOrder.map(level => {
-        const start = cumulative;
-        cumulative += (thresholdCounts[level] || 0) / total * 100;
-        return `${thresholdMeta[level].color} ${start.toFixed(2)}% ${cumulative.toFixed(2)}%`;
-      });
+      const isRegionMode = activeMode === "region";
+      const scope = isRegionMode ? baseStations() : baseStations().filter(item => (activeRegion === "all" || item.region === activeRegion) && (activeProvince === "all" || item.province === activeProvince));
+      const summaryOrder = isRegionMode ? regionOrder : thresholdOrder;
+      const summaryMeta = isRegionMode
+        ? Object.fromEntries(regionOrder.map(region => [region,{label:region,color:regionMeta[region]}]))
+        : thresholdMeta;
+      const summaryCounts = countBy(scope,isRegionMode ? "region" : "alertLevel");
+      const maxSummaryCount = Math.max(1,...summaryOrder.map(level => summaryCounts[level] || 0));
       const donut = $("#monitorRegionDonut");
       if (donut) {
-        donut.style.background = `conic-gradient(${segments.join(",")})`;
-        donut.innerHTML = `<div><b>${scope.length}</b><span>${activeMode === "abnormal" ? "สถานีผิดปกติ" : "สถานีทั้งหมด"}</span></div>`;
+        donut.classList.remove("monitor-vertical-bars");
+        donut.classList.toggle("monitor-horizontal-bars",isRegionMode);
+        if (isRegionMode) {
+          donut.style.background = "none";
+          donut.innerHTML = summaryOrder.map(level => {
+            const count = summaryCounts[level] || 0;
+            return `<button type="button" data-region-summary="${escapeHtml(level)}" aria-pressed="${activeRegion === level}" class="monitor-horizontal-bar ${activeRegion === level ? "active" : ""}" title="${escapeHtml(summaryMeta[level].label)} ${count} สถานี"><span>${escapeHtml(level.replace("ภาค",""))}</span><i><em style="--bar-width:${(count / maxSummaryCount * 100).toFixed(1)}%;--bar-color:${summaryMeta[level].color}"><b>${count}</b></em></i></button>`;
+          }).join("");
+        } else {
+          const total = scope.length || 1;
+          let cumulative = 0;
+          const segments = summaryOrder.map(level => {
+            const start = cumulative;
+            cumulative += (summaryCounts[level] || 0) / total * 100;
+            return `${summaryMeta[level].color} ${start.toFixed(2)}% ${cumulative.toFixed(2)}%`;
+          });
+          donut.style.background = `conic-gradient(${segments.join(",")})`;
+          donut.innerHTML = `<div><b>${scope.length}</b><span>สถานีทั้งหมด</span></div>`;
+        }
       }
       const regionList = $("#monitorRegionList");
-      if (regionList) regionList.innerHTML = thresholdOrder.map(level => `<div><i style="background:${thresholdMeta[level].color}"></i><span>${thresholdMeta[level].label}</span><b>${thresholdCounts[level] || 0}</b><small>สถานี</small></div>`).join("");
+      if (regionList) regionList.innerHTML = summaryOrder.map(level => isRegionMode
+        ? `<button type="button" data-region-summary="${escapeHtml(level)}" aria-pressed="${activeRegion === level}" class="region-summary-row ${activeRegion === level ? "active" : ""}"><i style="background:${summaryMeta[level].color}"></i><span>${summaryMeta[level].label}</span><strong>${summaryCounts[level] || 0} สถานี <small>${new Set(stations.filter(item => item.region === level).map(item => item.province)).size} จังหวัด</small></strong></button>`
+        : `<div><i style="background:${summaryMeta[level].color}"></i><span>${summaryMeta[level].label}</span><b>${summaryCounts[level] || 0}</b><small>สถานี</small></div>`).join("");
+      $("#monitorOverviewEyebrow").textContent = isRegionMode ? "REGION OVERVIEW" : "THRESHOLD OVERVIEW";
+      $("#monitorOverviewTitle").textContent = isRegionMode ? "สรุปจำนวนสถานีตามภาค" : "สรุปสถานะตามเกณฑ์";
+      $("#monitorOverviewHint").textContent = isRegionMode ? `ข้อมูลจริง ${regionOrder.filter(region => stations.some(item => item.region === region)).length} ภาค` : "เปลี่ยนตามภาคและจังหวัดที่เลือก";
+      const waitForRegion = isRegionMode && activeRegion === "all";
       const provinceScope = baseStations().filter(item => activeRegion === "all" || item.region === activeRegion);
       const provinceCounts = Object.entries(countBy(provinceScope,"province")).sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0],"th"));
       const maxProvince = Math.max(1,...provinceCounts.map(([,count]) => count));
-      $("#monitorProvinceTitle").textContent = activeRegion === "all" ? "จังหวัดที่มีสถานีสูงสุด" : `จังหวัดใน${activeRegion}`;
-      $("#monitorProvinceHint").textContent = `${provinceCounts.length} จังหวัด`;
+      $("#monitorProvinceTitle").textContent = waitForRegion ? "เลือกภาคเพื่อดูข้อมูลจังหวัด" : activeRegion === "all" ? "จังหวัดที่มีสถานีสูงสุด" : `จังหวัดใน${activeRegion}`;
+      $("#monitorProvinceHint").textContent = waitForRegion ? "ยังไม่ได้เลือกภาค" : `ข้อมูลจริง ${provinceCounts.length} จังหวัด`;
       const bars = $("#monitorProvinceBars");
-      if (bars) bars.innerHTML = provinceCounts.map(([province,count]) => `<button type="button" data-province-summary="${escapeHtml(province)}" class="${activeProvince === province ? "active" : ""}"><span>${escapeHtml(province)}</span><i><em style="width:${(count / maxProvince * 100).toFixed(1)}%"></em></i><b>${count}</b><small>สถานี</small></button>`).join("");
+      if (bars) bars.innerHTML = waitForRegion
+        ? `<div class="monitor-province-empty"><b>เลือกภาคจากกราฟด้านซ้าย</b><span>ระบบจะแสดงจังหวัดและจำนวนสถานีเฉพาะภาคที่เลือก</span></div>`
+        : `<div class="province-summary-grid">${provinceCounts.map(([province,count]) => {
+          const deviceCounts = provinceScope.filter(item => item.province === province).reduce((counts,item) => {
+            const state = monitorDeviceState(item);
+            counts[state] = (counts[state] || 0) + 1;
+            return counts;
+          },{});
+          return `<button type="button" data-province-summary="${escapeHtml(province)}" aria-pressed="${activeProvince === province}" class="province-summary-tile ${activeProvince === province ? "active" : ""}"><span>${escapeHtml(province)}</span><strong>${count}<small> สถานี</small></strong><span class="province-status-detail"><em class="online"></em>ออนไลน์ ${deviceCounts.online || 0}<em class="water-none"></em>อ่านค่าน้ำไม่ได้ ${deviceCounts["water-none"] || 0}<em class="camera-partial"></em>กล้องเดียว ${deviceCounts["camera-partial"] || 0}<em class="camera-offline"></em>ขัดข้อง ${deviceCounts["camera-offline"] || 0}</span><i class="province-share" style="--province-share:${(count / maxProvince * 100).toFixed(1)}%"></i></button>`;
+        }).join("")}</div>`;
     };
 
     const applyTableFilter = () => {
@@ -596,28 +630,43 @@
       const statusValue = status?.value || "all";
       visibleStations = baseStations().filter(item => {
         const haystack = `${item.code} ${item.name} ${item.subdistrict} ${item.district} ${item.province} ${item.region}`.toLowerCase();
-        return (statusValue === "all" || item.status === statusValue) && (activeRegion === "all" || item.region === activeRegion) && (activeProvince === "all" || item.province === activeProvince) && (!query || haystack.includes(query));
+        const statusMatch = statusValue === "all" || (statusValue === "water-none" ? monitorDeviceState(item) === "water-none" : item.status === statusValue);
+        return statusMatch && (activeRegion === "all" || item.region === activeRegion) && (activeProvince === "all" || item.province === activeProvince) && (!query || haystack.includes(query));
       });
+      const alertPriority = {critical:0,evacuate:1,prepare:2,watch:3,normal:4,nodata:5};
+      visibleStations.sort((a,b) => activeMode === "region"
+        ? regionOrder.indexOf(a.region) - regionOrder.indexOf(b.region) || a.province.localeCompare(b.province,"th") || a.no - b.no
+        : alertPriority[a.alertLevel] - alertPriority[b.alertLevel] || a.no - b.no);
       if (tableBody) tableBody.innerHTML = visibleStations.length ? visibleStations.map(item => `<tr data-device-status="${item.status}"><td><b>${escapeHtml(item.code)}</b></td><td class="station-name-cell">${escapeHtml(item.name)}</td><td>${escapeHtml(item.district)}</td><td>${escapeHtml(item.subdistrict)}</td><td>${escapeHtml(item.province)}</td><td>${escapeHtml(item.region)}</td><td><span class="camera-state ${item.camera1 ? "online" : "offline"}"><i></i>${item.camera1 ? "ออนไลน์" : "ผิดปกติ"}</span></td><td><span class="camera-state ${item.camera2 ? "online" : "offline"}"><i></i>${item.camera2 ? "ออนไลน์" : "ผิดปกติ"}</span></td><td>${item.waterAvailable ? `<b class="water-available">${escapeHtml(item.waterValue)}</b>` : `<span class="water-missing">ไม่มีข้อมูล</span>`}</td><td><time>${escapeHtml(item.time)}</time></td></tr>`).join("") : `<tr><td colspan="10"><div class="empty-state">ไม่พบสถานีตามตัวกรองที่เลือก</div></td></tr>`;
       $("#deviceResult").textContent = `แสดง ${visibleStations.length} จาก ${baseStations().length} สถานี`;
       $("#monitorConnectionText").textContent = `กำลังเชื่อมต่อสถานี ${visibleStations.length} จุด`;
+      window.monitorFilterState = {query,status:statusValue,region:activeRegion,province:activeProvince};
+      const mappedCount = visibleStations.filter(item => monitorStationCoordinate(item)).length;
+      $("#monitorCoordinateNote").textContent = `มีพิกัด ${mappedCount}/${visibleStations.length} สถานี · ไม่มีพิกัด ${visibleStations.length - mappedCount} · CCTV สรุปจุด.xlsx`;
+      $$(".real-monitor-marker").forEach(marker => {
+        const requestedMapState = ({online:"online","water-none":"water-none",delay:"camera-partial",offline:"camera-offline"})[statusValue];
+        const statusMatch = statusValue === "all" || marker.dataset.monitorMapState === requestedMapState;
+        marker.style.display = statusMatch && (activeRegion === "all" || marker.dataset.monitorRegion === activeRegion) && (activeProvince === "all" || marker.dataset.monitorProvince === activeProvince) && (!query || marker.dataset.monitorSearch.includes(query)) ? "" : "none";
+      });
+      window.filterMonitorMap?.(window.monitorFilterState);
     };
 
     const render = () => { renderOverview(); applyTableFilter(); };
     const regions = regionOrder.filter(region => stations.some(item => item.region === region));
     regionSelect.innerHTML = `<option value="all">ทุกภาค</option>${regions.map(region => `<option value="${region}">${region}</option>`).join("")}`;
     refreshProvinceOptions();
-    const online = stations.filter(item => item.status === "online").length;
-    const delay = stations.filter(item => item.status === "delay").length;
-    const offline = stations.filter(item => item.status === "offline").length;
     $("#allStationTabCount").textContent = stations.length;
-    $("#abnormalStationTabCount").textContent = stations.length - online;
-    $("#monitorMapSummary").textContent = `ออนไลน์ ${online} · ล่าช้า ${delay} · ออฟไลน์ ${offline} จุด`;
+    $("#regionTabCount").textContent = `${regions.length} ภาค`;
+    const mappedStateCounts = monitorMapStations().reduce((counts,item) => ((counts[item.mapState] = (counts[item.mapState] || 0) + 1),counts),{});
+    $("#monitorMapSummary").textContent = `สีเขียว ${mappedStateCounts.online || 0} · อ่านไม่ได้ ${mappedStateCounts["water-none"] || 0} · กล้องเดียว ${mappedStateCounts["camera-partial"] || 0} · ขัดข้อง ${mappedStateCounts["camera-offline"] || 0} จุด`;
     $("#monitorDataSource").textContent = `ที่มา: ${metadata.source}`;
 
     $$("[data-monitor-mode]").forEach(button => button.addEventListener("click", () => {
       activeMode = button.dataset.monitorMode;
-      $$("[data-monitor-mode]").forEach(item => item.classList.toggle("active",item === button));
+      $$("[data-monitor-mode]").forEach(item => {
+        item.classList.toggle("active",item === button);
+        item.setAttribute("aria-selected",String(item === button));
+      });
       render();
     }));
     search?.addEventListener("input", applyTableFilter);
@@ -631,6 +680,17 @@
       provinceSelect.value = activeProvince;
       render();
     });
+    const handleRegionSummaryClick = event => {
+      const button = event.target.closest("[data-region-summary]");
+      if (!button) return;
+      activeRegion = activeRegion === button.dataset.regionSummary ? "all" : button.dataset.regionSummary;
+      activeProvince = "all";
+      regionSelect.value = activeRegion;
+      refreshProvinceOptions();
+      render();
+    };
+    $("#monitorRegionList")?.addEventListener("click", handleRegionSummaryClick);
+    $("#monitorRegionDonut")?.addEventListener("click", handleRegionSummaryClick);
     $("#monitorRefresh")?.addEventListener("click", event => flashRefresh(event.currentTarget));
     $("#exportCsv")?.addEventListener("click", () => {
       const lines = [
@@ -881,6 +941,46 @@
     return ({red:"ต้องอพยพ",orange:"อพยพ",yellow:"เตรียมรับมือ",blue:"เฝ้าระวัง",green:"ติดตาม"})[severity] || "ไม่ระบุ";
   }
 
+  const monitorProvinceCenters = {
+    "อ่างทอง":[100.4551,14.5896],"พระนครศรีอยุธยา":[100.5689,14.3532],"ชัยนาท":[100.1251,15.1852],"สิงห์บุรี":[100.3967,14.8936],
+    "กาญจนบุรี":[99.5328,14.0228],"เพชรบุรี":[99.9399,13.1119],"เชียงใหม่":[98.9853,18.7883],"เชียงราย":[99.8406,19.9105],
+    "แม่ฮ่องสอน":[97.9685,19.3013],"ลำปาง":[99.4909,18.2888],"แพร่":[100.1403,18.1446],"น่าน":[100.7730,18.7756],
+    "ตาก":[99.1258,16.8839],"อุตรดิตถ์":[100.0993,17.6201],"ขอนแก่น":[102.8236,16.4322],"ชัยภูมิ":[102.0315,15.8068],
+    "จันทบุรี":[102.1038,12.6113],"นราธิวาส":[101.8253,6.4255],"ปัตตานี":[101.2505,6.8695],"พัทลุง":[100.0740,7.6167],
+    "ระนอง":[98.6085,9.9529],"สตูล":[100.0674,6.6238],"ยะลา":[101.2804,6.5411]
+  };
+
+  function monitorDeviceState(station) {
+    if (!station.camera1 && !station.camera2) return "camera-offline";
+    if (station.camera1 !== station.camera2) return "camera-partial";
+    if (!station.waterAvailable) return "water-none";
+    return "online";
+  }
+
+  function monitorDeviceStateLabel(state) {
+    return ({online:"กล้องออนไลน์และอ่านค่าระดับน้ำได้","water-none":"กล้องอ่านค่าน้ำไม่ได้","camera-partial":"กล้อง 1 ตัวมีสถานะออนไลน์","camera-offline":"กล้องทั้ง 2 ตัวติดเหตุขัดข้อง"})[state] || "ไม่ระบุสถานะ";
+  }
+
+  function monitorMarkerUrl(state) {
+    const names = {online:"CCTV_WATER_LOW.png","water-none":"CCTV_WATER_NONE.png","camera-partial":"CCTV_STATION_CAMERA_MAINTANANCE_LOW.png","camera-offline":"CCTV_STATION_CAMERA_OFFLINE.png"};
+    return `assets/cctv-markers/${names[state] || names.online}`;
+  }
+
+  function monitorStationCoordinate(station) {
+    const coordinate = window.MONITOR_COORDINATES?.[String(station.code).trim().toUpperCase()]?.coordinate;
+    return Array.isArray(coordinate) && coordinate.length === 2 && coordinate.every(Number.isFinite) ? coordinate : null;
+  }
+
+  function monitorMapStations() {
+    const stations = window.MONITOR_STATIONS || [];
+    const mappedStations = stations.map(station => ({...station,coordinate:monitorStationCoordinate(station)})).filter(station => station.coordinate);
+    const stationScore = station => [...String(station.code)].reduce((score,character,index) => score + character.charCodeAt(0) * (index + 11),0);
+    const exceptionCount = Math.round(mappedStations.length * .10);
+    const exceptionStates = ["water-none","camera-partial","camera-offline"];
+    const exceptionMap = new Map([...mappedStations].sort((a,b) => stationScore(a) - stationScore(b) || a.code.localeCompare(b.code)).slice(0,exceptionCount).map((station,index) => [station.code,exceptionStates[index % exceptionStates.length]]));
+    return mappedStations.map(station => ({...station,mapState:exceptionMap.get(station.code) || "online"}));
+  }
+
   function renderFallbackBasins() {
     const fallback = $(".map-fallback");
     if (!fallback || !basinFeatures.length) return;
@@ -928,13 +1028,17 @@
     const stations = page === "basin"
       ? (activeDrilldown.cctv || []).length ? [] : activeDrilldown.stations.map((station,index) => [...activeDrilldown.route[[0,Math.floor((activeDrilldown.route.length - 1) / 2),activeDrilldown.route.length - 1][index]],station.severity,station.code])
       : page === "monitor"
-        ? [[100.78,19.25,"online"],[100.35,17.62,"online"],[100.27,16.82,"delay"],[99.82,17.02,"offline"],[103.27,16.18,"online"],[100.12,15.70,"online"],[99.01,18.79,"offline"],[101.13,14.35,"online"]]
+        ? []
         : [];
     stations.forEach(([longitude,latitude,status,code]) => {
       const [cx,cy] = projectCoordinate([longitude,latitude]);
       const stationRecord = page === "basin" ? activeDrilldown.stations.find(item => item.code === code) : null;
       const marker = appendSvgElement(svg,"circle",{cx:cx.toFixed(1),cy:cy.toFixed(1),r:page === "basin" ? 9 : 7,class:`real-station ${status}`,"data-station":code || "","data-map-filterable":page === "basin" ? "true" : "false","data-severity":status,"data-province":stationRecord?.province || ""});
       if (page === "basin" && code) marker.addEventListener("click", () => document.dispatchEvent(new CustomEvent("station-popup-request", { detail:{code} })));
+    });
+    if (page === "monitor") monitorMapStations().forEach(station => {
+      const [cx,cy] = projectCoordinate(station.coordinate);
+      appendSvgElement(svg,"image",{x:(cx - 4.5).toFixed(1),y:(cy - 9).toFixed(1),width:9,height:9,href:monitorMarkerUrl(station.mapState),class:"real-monitor-marker","data-monitor-region":station.region,"data-monitor-province":station.province,"data-monitor-map-state":station.mapState,"data-monitor-search":`${station.code} ${station.name} ${station.province} ${station.region}`.toLowerCase()});
     });
     if (page === "basin") (activeDrilldown.sensors || []).forEach(sensor => {
       const [cx,cy] = projectCoordinate(sensor.coordinate);
@@ -1019,14 +1123,11 @@
       }
 
       if (page === "monitor") {
-        [
-          [100.9274,19.5188,"NAN01","online"],[100.083,17.79392,"UTT05","online"],[100.8634,19.2781,"NAN03","delay"],
-          [99.82,17.02,"YOM-04","offline"],[103.27,16.18,"CHI-07","online"],[100.12,15.70,"CPY-12","online"],
-          [99.01,18.79,"CMI-08","offline"],[101.13,14.35,"AYT-03","online"]
-        ].forEach(([longitude,latitude,code,status]) => stationLayer.add(new Graphic({
-          geometry:{type:"point",longitude,latitude},
-          symbol:{type:"simple-marker",color:status === "online" ? "#32d89a" : status === "delay" ? "#f28a2e" : "#8d929f",size:11,outline:{color:"#fff",width:2}},
-          attributes:{code,status},popupTemplate:{title:code,content:`สถานะการสื่อสาร: ${status}`}
+        monitorMapStations().forEach(station => stationLayer.add(new Graphic({
+          geometry:{type:"point",longitude:station.coordinate[0],latitude:station.coordinate[1]},
+          symbol:{type:"picture-marker",url:monitorMarkerUrl(station.mapState),width:7,height:7,xoffset:0,yoffset:2},
+          attributes:{code:station.code,status:station.status,mapState:station.mapState,waterStatus:station.waterAvailable ? "available" : "none",region:station.region,province:station.province,searchText:`${station.code} ${station.name} ${station.province} ${station.region}`.toLowerCase()},
+          popupTemplate:{title:`${station.code} · ${station.name}`,content:`อ.${station.district} จ.${station.province}<br><b>${monitorDeviceStateLabel(station.mapState)}</b><br>${station.waterAvailable ? `ระดับน้ำ ${station.waterValue}` : "ไม่มีข้อมูลระดับน้ำ"}`}
         })));
       }
 
@@ -1087,6 +1188,21 @@
       $("#zoomIn")?.addEventListener("click", () => { view.zoom += 1; });
       $("#zoomOut")?.addEventListener("click", () => { view.zoom -= 1; });
 
+      if (page === "monitor") {
+        let currentMonitorMarkerSize = 0;
+        const resizeMonitorMarkers = zoom => {
+          const size = zoom < 6.5 ? 7 : zoom < 8 ? 12 : 20;
+          if (size === currentMonitorMarkerSize) return;
+          currentMonitorMarkerSize = size;
+          stationLayer.graphics.forEach(graphic => {
+            if (!graphic.attributes?.mapState) return;
+            graphic.symbol = {type:"picture-marker",url:monitorMarkerUrl(graphic.attributes.mapState),width:size,height:size,xoffset:0,yoffset:Math.round(size * .35)};
+          });
+        };
+        resizeMonitorMarkers(view.zoom);
+        view.watch("zoom", resizeMonitorMarkers);
+      }
+
       if (page === "overview") {
         window.filterMapBasins = (severity, selectedBasin) => {
           [basinLayer,basinLabelLayer].forEach(layer => layer.graphics.forEach(graphic => {
@@ -1101,6 +1217,23 @@
           const graphic = response.results.map(result => result.graphic).find(item => item?.attributes?.basin);
           if (graphic?.attributes?.basin && graphic.attributes.severity !== "normal") window.location.href = `basin.html?basin=${graphic.attributes.basin}`;
         });
+      }
+
+      if (page === "monitor") {
+        window.filterMonitorMap = ({query="",status="all",region="all",province="all"} = {}) => {
+          const normalizedQuery = String(query).trim().toLowerCase();
+          stationLayer.graphics.forEach(graphic => {
+            const requestedMapState = ({online:"online","water-none":"water-none",delay:"camera-partial",offline:"camera-offline"})[status];
+            const statusMatch = status === "all" || graphic.attributes?.mapState === requestedMapState;
+            graphic.visible = statusMatch && (region === "all" || graphic.attributes?.region === region) && (province === "all" || graphic.attributes?.province === province) && (!normalizedQuery || graphic.attributes?.searchText?.includes(normalizedQuery));
+          });
+          $$(".real-monitor-marker").forEach(marker => {
+            const requestedMapState = ({online:"online","water-none":"water-none",delay:"camera-partial",offline:"camera-offline"})[status];
+            const statusMatch = status === "all" || marker.dataset.monitorMapState === requestedMapState;
+            marker.style.display = statusMatch && (region === "all" || marker.dataset.monitorRegion === region) && (province === "all" || marker.dataset.monitorProvince === province) && (!normalizedQuery || marker.dataset.monitorSearch.includes(normalizedQuery)) ? "" : "none";
+          });
+        };
+        window.filterMonitorMap(window.monitorFilterState || {});
       }
 
       if (page === "basin") {

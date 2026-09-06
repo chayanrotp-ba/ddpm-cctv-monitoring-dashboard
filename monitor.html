@@ -28,8 +28,8 @@
       </div>
       <div class="map-title-card surface"><span class="agency-mark">ปภ.</span><span><b>สถานีตรวจวัดทั้งหมด</b><small id="monitorMapSummary">ออนไลน์ 168 · ล่าช้า 0 · ออฟไลน์ 12 จุด</small></span></div>
       <div class="map-tools surface"><button id="homeBtn" type="button">⌂</button><button id="zoomIn" type="button">＋</button><button id="zoomOut" type="button">−</button></div>
-      <div class="map-legend surface"><b>สถานะอุปกรณ์</b><span><i class="dot green"></i>ออนไลน์</span><span><i class="dot orange"></i>ข้อมูลล่าช้า</span><span><i class="dot gray-dark"></i>ออฟไลน์</span></div>
-      <div class="mock-label surface">ข้อมูลจำลองเพื่อยืนยันแนวทาง</div>
+      <div class="map-legend monitor-device-legend surface"><b>สถานะอุปกรณ์ · จุดที่มีพิกัด</b><span><img src="assets/cctv-markers/CCTV_WATER_LOW.png" alt="สัญลักษณ์สถานะออนไลน์">ออนไลน์ / อ่านค่าระดับน้ำได้</span><span><img src="assets/cctv-markers/CCTV_WATER_NONE.png" alt="สัญลักษณ์อ่านค่าน้ำไม่ได้">กล้องอ่านค่าน้ำไม่ได้</span><span><img src="assets/cctv-markers/CCTV_STATION_CAMERA_MAINTANANCE_LOW.png" alt="สัญลักษณ์กล้องออนไลน์หนึ่งตัว">กล้อง 1 ตัวมีสถานะออนไลน์</span><span><img src="assets/cctv-markers/CCTV_STATION_CAMERA_OFFLINE.png" alt="สัญลักษณ์กล้องขัดข้อง">กล้องทั้ง 2 ตัวติดเหตุขัดข้อง</span></div>
+      <div class="mock-label surface" id="monitorCoordinateNote">พิกัดอ้างอิงจาก CCTV สรุปจุด.xlsx</div>
     </section>
 
     <section class="content-pane monitor-content">
@@ -39,28 +39,28 @@
       </header>
 
       <nav class="monitor-tabs monitor-scope-tabs" aria-label="ขอบเขตสถานี">
-        <button class="active" type="button" data-monitor-mode="all">ทุกสถานีตามเกณฑ์ <b id="allStationTabCount">180</b></button>
-        <button type="button" data-monitor-mode="abnormal">สถานีผิดปกติ <b id="abnormalStationTabCount">12</b></button>
+        <button class="active" type="button" data-monitor-mode="threshold" aria-selected="true">รายการทั้งหมดตามเกณฑ์ที่แจ้งเตือน <b id="allStationTabCount">180</b></button>
+        <button type="button" data-monitor-mode="region" aria-selected="false">รายการทั้งหมดตามภาค <b id="regionTabCount">5 ภาค</b></button>
       </nav>
 
       <section class="monitor-panel active">
         <div class="monitor-filters">
           <label class="search-control"><span>⌕</span><input id="monitorSearch" type="search" placeholder="ค้นหารหัสสถานี ชื่อ หรือจังหวัด"></label>
-          <select id="deviceStatus"><option value="all">ทุกสถานะ</option><option value="online">ออนไลน์</option><option value="delay">ข้อมูลล่าช้า</option><option value="offline">ออฟไลน์</option></select>
+          <select id="deviceStatus"><option value="all">ทุกสถานะ</option><option value="online">กล้องออนไลน์</option><option value="water-none">อ่านค่าน้ำไม่ได้</option><option value="delay">กล้อง 1 ตัวออนไลน์</option><option value="offline">กล้อง 2 ตัวขัดข้อง</option></select>
           <select id="monitorRegion"><option value="all">ทุกภาค</option></select>
           <select id="monitorProvince"><option value="all">ทุกจังหวัด</option></select>
           <button id="monitorRefresh" type="button">↻ รีเฟรช</button>
         </div>
         <div class="monitor-overview-grid">
           <article class="monitor-region-card">
-            <header><div><p>THRESHOLD OVERVIEW</p><h2>สรุปสถานะตามเกณฑ์</h2></div><span>เปลี่ยนตามภาคและจังหวัดที่เลือก</span></header>
+            <header><div><p id="monitorOverviewEyebrow">THRESHOLD OVERVIEW</p><h2 id="monitorOverviewTitle">สรุปสถานะตามเกณฑ์</h2></div><span id="monitorOverviewHint">เปลี่ยนตามภาคและจังหวัดที่เลือก</span></header>
             <div class="monitor-region-chart">
               <div class="monitor-region-donut" id="monitorRegionDonut"><div><b>180</b><span>สถานีทั้งหมด</span></div></div>
               <div class="monitor-region-list" id="monitorRegionList"></div>
             </div>
           </article>
           <article class="monitor-province-card">
-            <header><div><p>PROVINCE DISTRIBUTION</p><h2 id="monitorProvinceTitle">จังหวัดที่มีสถานีสูงสุด</h2></div><span id="monitorProvinceHint">23 จังหวัด</span></header>
+            <header><div><p>PROVINCE DISTRIBUTION</p><h2 id="monitorProvinceTitle">จังหวัดที่มีสถานีสูงสุด</h2></div><span id="monitorProvinceHint">ข้อมูลจริง 23 จังหวัด</span></header>
             <div class="monitor-province-bars" id="monitorProvinceBars"></div>
           </article>
         </div>
@@ -83,6 +83,7 @@
   </main>
   <script src="data/onwr-basins-22.js"></script>
   <script src="data/monitor-stations.js"></script>
+  <script src="data/monitor-coordinates.js"></script>
   <script src="https://js.arcgis.com/4.31/"></script>
   <script src="app.js"></script>
 </body>
