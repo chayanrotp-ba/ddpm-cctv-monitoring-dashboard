@@ -1,6 +1,7 @@
 # DDPM CCTV Basin-Centric Mockup
 
-Mockup ที่ยึดโครงสร้างและภาษาภาพจาก `https://cctv.disaster.go.th/dashboard` แล้วปรับลำดับข้อมูลให้เหมาะกับผู้บริหารและทีมมอนิเตอร์ระบบ
+Mockup ที่ยึดโครงสร้างและภาษาภาพจาก `https://cctv.disaster.go.th/dashboard` แล้วปรับลำดับข้อมูลให้เหมาะกับผู้บริหารและทีมมอนิเตอร์ระบบ 
+ตัวอย่างระบบ `https://chayanrotp-ba.github.io/ddpm-cctv-monitoring-dashboard/`
 
 ## หน้าจอหลัก
 
