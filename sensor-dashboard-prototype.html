@@ -364,7 +364,7 @@ function populateOptions(){
 }
 function refreshControls(){
  $('#periodSelect').value=state.period;$('#basinPeriodSelect').value=state.period;
- $('#modeSelect').value=state.mode;$('#basinFilter').value=state.basin;
+ $('#modeSelect').value=state.mode;$('#basinFilter').value=state.basin===null?'unmapped':state.basin;
  $('#provinceFilter').value=state.province;$('#searchFilter').value=state.query;
  $('#basinDetailSelect').value=state.detailBasin;
  $('#healthSelect').value=state.health;
@@ -402,7 +402,7 @@ function renderOverview(){
   return '<button class="rank-item" type="button" data-station="'+s.id+'"><span class="rank-no">'+String(i+1).padStart(2,'0')+'</span><span><strong>'+s.id+'</strong><small>'+escapeHtml(s.name)+' · '+s.province+'</small></span><span class="rain-num">'+formatNum(rainfall(s))+'<small>มม.</small></span><span>'+levelHtml(s)+'</span></button>';
  }).join(''):'<div class="empty-state">ไม่พบสถานีตามเงื่อนไข</div>';
  $('#overviewTable').innerHTML=ordered.length?ordered.map(function(s){
- return '<tr><td><button class="inline-link" type="button" data-station="'+s.id+'">'+s.id+'</button><small>'+escapeHtml(s.name)+'</small></td><td>'+s.province+'<small>'+escapeHtml(basinName(s.basin))+'</small></td><td class="number">'+(s.health==='offline'?'—':formatNum(rainfall(s))+' มม.')+'</td><td><span class="level-pill">'+(s.custom?'Custom':'Default')+'</span></td><td>'+levelHtml(s)+'</td><td><small>'+statusHtml(s)+'</small></td></tr>';
+ return '<tr><td><button class="inline-link" type="button" data-station="'+s.id+'">'+s.id+'</button><small>'+escapeHtml(s.name)+'</small></td><td>'+s.province+'<small>'+escapeHtml(basinName(s.basin))+'</small></td><td class="number">'+(s.health==='offline'?'—':formatNum(rainfall(s))+' มม.')+'</td><td><span class="level-pill">'+(s.custom?'Custom':'Default')+'</span></td><td>'+levelHtml(s)+'</td><td><small>'+(s.health==='offline'?'ไม่มีข้อมูลล่าสุด':'20/11/2569 10:40 (จำลอง)')+'</small>'+statusHtml(s)+'</td></tr>';
  }).join(''):'<tr><td colspan="6"><div class="empty-state">ไม่พบข้อมูลสถานี</div></td></tr>';
 }
 function renderBasin(){
